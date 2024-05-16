@@ -20,8 +20,11 @@ export default createVuetify({
           light: {
             dark: false,
             colors: {
-              primary: colors.blue.lighten4,
-              secondary: colors.red.lighten4,
+              primary: colors.indigo.darken1,
+              primary_light: colors.indigo.lighten3,
+              secondary: colors.red.darken1,
+              teriary: colors.green.darken1,
+              disable: colors.grey.lighten3,
             }
           },
         },
