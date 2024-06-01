@@ -1,92 +1,70 @@
 <template>
-    <div class="mx-3 my-2 card">
-        <div class="row">
-            <div class="col d-flex">
-                <pre>RQST: </pre>
-                <pre>Jochebed Miranda</pre>
-            </div>
-            <div class="col d-flex">
-                <pre>DOC ID: </pre>
-                <pre>22-10118</pre>
-            </div>
-            <hr>
-            <div class="row det">
-                <div class="col">
-                    <pre>Name: </pre>
-                    <p>Mark Anthony A. Rodriguez</p>
-                </div>
-                <div class="col">
-                    <pre>Phone Number: </pre>
-                    <p>09637752208</p>
-                </div>
-                <div class="col">
-                    <pre>Email: </pre>
-                    <p>markanthony.rodriguez @unc.edu.ph</p>
-                </div>
-                <div class="col">
-                    <pre>Address: </pre>
-                    <p>Zone 5, La Purisima, Lupi, Camarines Sur</p>
-                </div>
-                <div class="col">
-                    <pre>Document Type: </pre>
-                    <p>Indigency</p>
-                </div>
-                <div class="col">
-                    <pre>Payment Status: </pre>
-                    <p>Paid</p>
-                </div>
-                <div class="col">
-                    <pre>Purpose: </pre>
-                    <p>Sample Purpose Here</p>
-                </div>
-            </div>
-            <hr>
-            <div class="buttons">
-                <v-row class="ma-0">
-                    <v-col cols="auto" class="d-flex pa-0 ga-3">
-                        <v-btn width="100" flat color="primary">Edit</v-btn>
-                        <v-btn width="100" flat color="primary">Del</v-btn>
-                    </v-col>
-                </v-row>
-                <v-row class="ma-0">
-                    <v-col cols="auto" class="d-flex pa-0 ga-3">
-                        <v-btn width="100" flat color="primary">Payment</v-btn>
-                        <v-btn width="100" flat color="primary">Print</v-btn>
-                    </v-col>
-                </v-row>
-            </div>
-        </div>
-    </div>
+    <v-row>
+        <v-col class="d-flex flex-column ga-5">
+            <v-text-field v-if="selectedRow.payment_status == 'Pending'" hide-details density="compact"
+                label="Payment Status" v-model="selectedRow.payment_status" variant="solo" single-line readonly
+                bg-color="red"></v-text-field>
+            <v-text-field v-else hide-details density="compact" label="Payment Status"
+                v-model="selectedRow.payment_status" variant="solo" single-line readonly
+                bg-color="green"></v-text-field>
+            <v-text-field hide-details density="compact" label="Document ID" v-model="selectedRow.document_id"
+                variant="outlined" readonly></v-text-field>
+            <v-text-field hide-details density="compact" label="Name" v-model="fullName" variant="outlined"
+                readonly></v-text-field>
+            <v-text-field hide-details density="compact" label="Email" v-model="selectedRow.email" variant="outlined"
+                readonly></v-text-field>
+            <v-text-field hide-details density="compact" label="Phone Number" v-model="selectedRow.phone_num"
+                variant="outlined" readonly></v-text-field>
+            <v-text-field hide-details density="compact" label="Address" v-model="selectedRow.address"
+                variant="outlined" readonly></v-text-field>
+            <v-text-field hide-details density="compact" label="Document Type" v-model="selectedRow.document_type"
+                variant="outlined" readonly></v-text-field>
+            <v-text-field hide-details density="compact" label="Purpose" v-model="selectedRow.purpose"
+                variant="outlined" readonly></v-text-field>
+        </v-col>
+    </v-row>
+    <v-row>
+        <v-col>
+            <v-btn width="100%" color="primary" flat>
+                Action
+                <v-menu activator="parent">
+                    <v-list>
+                        <v-list-item v-if="selectedRow.payment_status == 'Pending'">
+                            <v-btn class="w-100" flat color="primary">Payment</v-btn>
+                        </v-list-item>
+                        <v-list-item v-if="selectedRow.payment_status != 'Pending'">
+                            <v-btn class="w-100" flat color="primary">Print</v-btn>
+                        </v-list-item>
+                        <v-list-item v-if="selectedRow.payment_status == 'Pending'">
+                            <RequestForm icon="mdi-account-multiple-plus" titleBox="Edit Info"
+                                :selectedRow="selectedRow" />
+                        </v-list-item>
+                        <v-list-item>
+                            <v-btn class="w-100" variant="outlined" @click="">Remove</v-btn>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </v-btn>
+        </v-col>
+    </v-row>
 </template>
-<style scoped>
-.info {
-    display: flex;
-    margin: 0;
-    padding: 0;
+<script>
+export default {
+    props: {
+        selectedRow: {
+            type: Object
+        }
+    },
+    data() {
+        return {
+        }
+    },
+    computed: {
+        fullName() {
+            const { lname, fname, mname, suffix } = this.selectedRow;
+            const middleInitial = mname ? `${mname.charAt(0)}.` : '';
+            return `${lname}, ${fname} ${middleInitial} ${suffix}`.trim();
+        }
+    }
 }
-
-.det pre,
-p {
-    font-size: .9rem;
-    font-family: "Poppins";
-}
-
-.det pre:nth-child(odd) {
-    font-size: .7rem;
-    font-family: "Poppins";
-}
-
-.card {
-    width: 15%;
-}
-
-.buttons{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: .5rem;
-    padding: 0;
-    gap: 1rem;
-}
-</style>
+</script>
