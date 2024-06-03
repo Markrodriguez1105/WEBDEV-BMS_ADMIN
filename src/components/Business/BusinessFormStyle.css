@@ -1,0 +1,54 @@
+.search-bar {
+  max-width: 400px;
+  margin-right: 50px;
+  margin-bottom: 40px;
+  margin-top: 40px;
+  color: white !important;
+  background-color: #3a53a5 !important;
+}
+
+.add-btn {
+  margin-left: 50px;
+  width: 100px;
+  height: 40px;
+  color: white !important;
+  background-color: #3a53a5 !important;
+}
+
+.table-row {
+  background-color: #f0f0f0 !important;
+  color: black !important;
+}
+
+.v-table--density-default {
+  border-radius: 5px;
+  background-color: #3a53a5 !important;
+  color: white !important;
+  margin-left: 2% !important;
+  width: 96%;
+} 
+
+.action-icons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 80px; /* Adjust as needed */
+}
+
+.action-icons v-icon {
+  cursor: pointer;
+}
+
+.filter1 {
+  margin-left: 50px !important;
+  font-weight: bold;
+  
+}
+.filter2 {
+  margin-left: 350px !important;
+  font-weight: bold;
+}
+
+.filterselect {
+  margin-right: 50px;
+}
