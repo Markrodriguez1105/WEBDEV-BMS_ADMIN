@@ -1,10 +1,10 @@
 <template>
-    <div class="business-title">
-        <div class="title-line"></div>
-        <h1 class="title-text">Business Profiling</h1>
-        <div class="title-line"></div>
-      </div>
-    <BusinessForm />
+  <div class="business-title">
+      <div class="title-line"></div>
+      <h1 class="title-text">Business Profiling</h1>
+      <div class="title-line"></div>
+    </div>
+  <BusinessForm />
 </template>
 
 <script setup>
