@@ -15,6 +15,7 @@ import Report from "../pages/Report.vue";
 import Request from "../pages/Request.vue";
 import Treasury from "../pages/Treasury.vue";
 
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
