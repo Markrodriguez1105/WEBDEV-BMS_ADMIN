@@ -1,14 +1,31 @@
 <template>
   <v-app>
-    <v-main>
-      <SideNav />
+    <v-main v-if="access">
+      <SideNav @logout="login($event)" />
       <v-content>
         <router-view />
       </v-content>
     </v-main>
+    <v-main v-else>
+      <Landing @login="login($event)" />
+    </v-main>
   </v-app>
 </template>
+<script>
 
-<script setup>
-//
+export default{
+  data(){
+    return{
+      access: true,
+    }
+  },
+  methods: {
+    login(value){
+      this.access = value;
+    },
+    logout(value){
+      this.access = value;
+    }
+  }
+}
 </script>

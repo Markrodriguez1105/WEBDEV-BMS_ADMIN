@@ -53,7 +53,7 @@ export default {
             showOnlyDocumentType: 'All',
             document: [
                 {
-                    document_id: "22-10118",
+                    certification_id: "22-10118",
                     fname: "Mark Anthony",
                     mname: "Amican",
                     lname: "Rodriguez",
@@ -64,20 +64,6 @@ export default {
                     document_type: "Indegency",
                     date_request: "05-28-2024",
                     payment_status: "Paid",
-                    purpose: 'Scholarship'
-                },
-                {
-                    document_id: "22-10118",
-                    fname: "Mark Anthony",
-                    mname: "Amican",
-                    lname: "Rodriguez",
-                    suffix: "Jr.",
-                    phone_num: '09637752208',
-                    email: 'markanthony.rodriguez@unc.edu.ph',
-                    address: 'Zone 1, Bonifacio, San Fernando, Camarines Sur',
-                    document_type: "Indegency",
-                    date_request: "05-28-2024",
-                    payment_status: "Pending",
                     purpose: 'Scholarship'
                 },
             ]
