@@ -1,40 +1,14 @@
 <template>
     <v-dialog max-width="600" persistent>
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn :disabled="user.position_id != 3" width="100%" :prepend-icon="icon" variant="flat" v-bind="activatorProps" color="surface-variant"
+            <v-btn width="100%" :prepend-icon="icon" variant="flat" v-bind="activatorProps" color="success"
                 :text="titleBox"></v-btn>
         </template>
 
         <template v-slot:default="{ isActive }">
             <v-card class="pa-5" :prepend-icon="icon" :title="titleBox">
                 <v-form @submit.prevent class="ma-7 d-flex flex-column ga-2">
-                    <div v-if="!payment">
-                        <v-row>
-                            <v-combobox v-model="doc.resident_id" label="Resident Name *"
-                                :rules="[v => !!v || 'Required', v => names.includes(v) || 'Not Resident']"
-                                :items="names" item-title="name" item-value="id" variant="outlined"></v-combobox>
-                        </v-row>
-                        <v-row>
-                            <v-text-field v-model="doc.email" clearable label="Email *" :rules="[v => !!v || 'Required', v => /^[a-z0-9.-]+@[a-z.-]+\.[a-z]+$/i.test(v)
-                                || 'Invalid Email']" variant="outlined"></v-text-field>
-                        </v-row>
-                        <v-row>
-                            <v-text-field v-model="doc.phone_num" clearable label="Phone Number *"
-                                :rules="[v => !!v || 'Required', v => v.length == 11 && /[0-9-]+/.test(v) || 'Invalid Phone Number']"
-                                variant="outlined"></v-text-field>
-                        </v-row>
-                        <v-row>
-                            <v-combobox v-model="doc.document_type" label="Document Type *" :items="documents"
-                                item-title="description" item-value="document_id"
-                                :rules="[v => !!v || 'Required', v => documents.includes(v) || 'Not a Document']"
-                                variant="outlined"></v-combobox>
-                        </v-row>
-                        <v-row>
-                            <v-text-field v-model="doc.purpose" clearable label="Purpose*"
-                                :rules="[v => !!v || 'Required']" variant="outlined"></v-text-field>
-                        </v-row>
-                    </div>
-                    <div v-else>
+                    <div>
                         <v-row>
                             <div class="w-100 pb-5">
                                 <v-btn append-icon="mdi-chevron-right" :color="isRegistered.color"
@@ -63,13 +37,11 @@
                         </v-row>
                     </div>
                     <v-row class="d-flex justify-end ma-0 pa-0 ga-2">
-                        <v-col v-if="payment">
+                        <v-col>
                             <h3>Change: ₱ {{ totalChange }}</h3>
                         </v-col>
 
-                        <v-btn v-if="payment" size="large" text="Back" @click="payment = false"
-                            prepend-icon="mdi-arrow-left" flat></v-btn>
-                        <v-btn v-else size="large" text="Cancel" @click="cancel(isActive)" prepend-icon="mdi-close"
+                        <v-btn size="large" text="Cancel" @click="cancel(isActive)" prepend-icon="mdi-close"
                             flat></v-btn>
                         <v-dialog v-model="discardOverlay" persistent max-width="500px" transition="dialog-transition">
                             <v-card>
@@ -87,8 +59,6 @@
                         </v-dialog>
                         <v-btn v-if="payment || selectedRow" color="primary" size="large" text="Submit" type="submit"
                             prepend-icon="mdi-content-save-check" variant="flat" @click="submit()"></v-btn>
-                        <v-btn v-else :disabled="!doc.resident_id.id > 0" size="large" text="Next" type="submit"
-                            prepend-icon="mdi-arrow-right" variant="flat" @click="payment = true, cedulaValidate()"></v-btn>
                     </v-row>
                 </v-form>
             </v-card>
@@ -114,49 +84,34 @@ export default {
         icon: {
             type: String,
             require: true,
-        },
-        user: {
-            type: Object,
         }
     },
-    data: () => ({
-        payment: false,
-        isRegistered: {
-            color: 'success', text: 'Cedula Registered'
-        },
-        discardOverlay: false,
-        doc: {
-            certification_id: '',
-            resident_id: '',
-            email: '',
-            phone_num: '',
-            document_type: '',
-            purpose: '',
-            document_cost: '',
-            stamp_fee: '',
-            total: '',
-            fee: '',
-        },
-        names: [],
-        documents: [],
-    }),
+    data() {
+        return {
+            payment: false,
+            isRegistered: {
+                color: 'success', text: 'Cedula Registered'
+            },
+            discardOverlay: false,
+            doc: {
+                certification_id: '',
+                resident_id: '',
+                email: '',
+                phone_num: '',
+                document_type: '',
+                purpose: '',
+                document_cost: '',
+                stamp_fee: '',
+                total: '',
+                fee: '',
+            },
+        }
+    },
     methods: {
         submit() {
             axios.post('http://localhost/bms/src/php/Request/insert.php', {
-                action: 'insert',
-                certification: this.doc.certification_id,
-                resident_id: this.doc.resident_id.id,
-                email: this.doc.email,
-                phone_num: this.doc.phone_num,
-                document_type: this.doc.document_type.document_id,
-                purpose: this.doc.purpose,
-            }).then(response => {
-                console.log(response.data);
-            });
-
-            axios.post('http://localhost/bms/src/php/Request/insert.php', {
                 action: 'insertPayment',
-                certification: this.doc.certification_id,
+                certification: this.selectedRow.certification_id,
                 document_cost: this.doc.document_cost,
                 stamp_fee: this.doc.stamp_fee,
                 fee: this.doc.fee,
@@ -169,7 +124,6 @@ export default {
         setForm() {
             if (this.selectedRow) {
                 this.doc = this.selectedRow
-                this.doc.resident_id = this.fullName(this.selectedRow);
             } else {
                 this.doc = {
                     certification_id: '',
@@ -220,16 +174,17 @@ export default {
                 this.documents = response.data;
             })
         },
-        cedulaValidate(){
+        cedulaValidate() {
             axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'cedulaValidate',
-                id: this.doc.resident_id.id,
+                id: selectedRow.resident_id.id,
             }).then(response => {
+                console.log(selectedRow.resident_id.id,);
                 if (!response.data) {
                     this.isRegistered.color = 'error';
                     this.isRegistered.text = 'Cedula Not Registered';
                 } else {
-                    this.isRegistered.color ='success';
+                    this.isRegistered.color = 'success';
                     this.isRegistered.text = 'Cedula Registered';
                 }
             })
@@ -244,10 +199,7 @@ export default {
         }
     },
     mounted() {
-        this.genDocId();
-        this.setForm();
-        this.getResident();
-        this.getDocuments();
+        this.cedulaValidate();
     }
 }
 </script>
