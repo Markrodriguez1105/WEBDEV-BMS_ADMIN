@@ -18,7 +18,7 @@
         </tbody>
     </v-table>
 </template>
-<style>
+<style scoped>
 .row:nth-child(odd){
     background-color: aliceblue;
 }

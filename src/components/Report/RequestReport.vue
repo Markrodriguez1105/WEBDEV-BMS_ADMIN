@@ -588,7 +588,7 @@ export default {
 
 
 
-<style>
+<style scoped>
 .main-content {
   margin-top: 1em;
 }

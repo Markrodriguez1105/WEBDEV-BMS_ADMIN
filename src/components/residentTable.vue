@@ -58,12 +58,12 @@
 
         <v-row>
           <v-col class="d-flex">
-            <v-select v-model="resident.gender" width="500" style="width: 85px;" label="Gender" :items="['Female', 'Male']"
-              variant="outlined" :rules="[rules.required]"></v-select>
+            <v-select v-model="resident.gender" width="500" style="width: 85px;" label="Gender"
+              :items="['Female', 'Male']" variant="outlined" :rules="[rules.required]"></v-select>
             <v-text-field v-model="resident.birthDate" class="ms-3 shrink" style="width: 85px;" label="Birth Date"
               variant="outlined" type="date" :rules="[rules.required, rules.birthDate]" clearable></v-text-field>
-            <v-text-field v-model="resident.age" :value="calculateAge(resident.birthDate)" focused class="ms-3" label="Age"
-              variant="outlined" readonly></v-text-field>
+            <v-text-field v-model="resident.age" :value="calculateAge(resident.birthDate)" focused class="ms-3"
+              label="Age" variant="outlined" readonly></v-text-field>
           </v-col>
         </v-row>
 
@@ -109,7 +109,8 @@
 
         <v-row>
           <v-col class="d-flex">
-            <v-select v-model="resident.hhHead" label="Household Head" variant="outlined" :rules="rules.required"></v-select>
+            <v-select v-model="resident.hhHead" label="Household Head" variant="outlined"
+              :rules="rules.required"></v-select>
             <v-text-field v-model="resident.hhSize" class="ms-3" label="Household Size" variant="outlined"
               readonly></v-text-field>
             <v-text-field v-model="resident.relToHead" class="ms-3" label="Relation to Head" variant="outlined"
@@ -184,7 +185,7 @@
             <tr v-for="item in filteredItems" :key="item.resident_id" @click="onRowClick(item)">
               <!-- <td>{{ convertToSentenceCase(item.first_name) }} {{ convertToSentenceCase(item.middle_name) }} {{
         convertToSentenceCase(item.last_name) }}</td> -->
-        <td>{{ item.first_name }} {{ item.middle_name }} {{item.last_name}} </td>
+              <td>{{ item.first_name }} {{ item.middle_name }} {{ item.last_name }} </td>
               <td>{{ calculateAge(item.birth_date) }}</td>
               <td>{{ item.gender }}</td>
               <td>{{ convertToSentenceCase(item.nationality) }}</td>
@@ -206,7 +207,7 @@
           <div class="mt-4 ">
             <p class="font-weight-light ml-3 text-caption">Full Name:</p>
             <p class="font-weight-regular ml-3 mb-2 text-h6">{{ convertToSentenceCase(selectedItem.first_name) }} {{
-        convertToSentenceCase(selectedItem.middle_name) }} {{ convertToSentenceCase(selectedItem.last_name) }}</p>
+              convertToSentenceCase(selectedItem.middle_name) }} {{ convertToSentenceCase(selectedItem.last_name) }}</p>
             <p class="font-weight-light  ml-3 text-caption ">Age:</p>
             <p class="font-weight-regular ml-3 mb-2 text-h6">{{ calculateAge(selectedItem.birth_date) }}</p>
             <p class="font-weight-light  ml-3  text-caption">Gender:</p>
@@ -295,24 +296,24 @@ export default {
       selectedItem: null,
       residents: [],
       resident: {
-          resident_id: '',
-          firstName: '',
-          middleName: '',
-          lastName: '',
-          suffix: '',
-          gender: '',
-          birthDate: '',
-          age: '',
-          nationality: '',
-          religion: '',
-          email: '',
-          civStat: '',
-          votStat: '',
-          zone: '',
-          contactNum: '',
-          hhHead: '',
-          hhSize: '',
-          relToHead: '',
+        resident_id: '',
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        suffix: '',
+        gender: '',
+        birthDate: '',
+        age: '',
+        nationality: '',
+        religion: '',
+        email: '',
+        civStat: '',
+        votStat: '',
+        zone: '',
+        contactNum: '',
+        hhHead: '',
+        hhSize: '',
+        relToHead: '',
       },
 
       rules: {
@@ -345,20 +346,20 @@ export default {
       this.selectedItem = item;
     },
     convertToSentenceCase(name) {
-  if (!name) return ''; // If name is undefined or null, return an empty string
+      if (!name) return ''; // If name is undefined or null, return an empty string
 
-  let words = name.split(" ");
+      let words = name.split(" ");
 
-  // Capitalize the first letter of each word
-  let sentenceCasedWords = words.map(word => {
-    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-  });
+      // Capitalize the first letter of each word
+      let sentenceCasedWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      });
 
-  // Join the capitalized words back into a string
-  let sentenceCasedName = sentenceCasedWords.join(" ");
+      // Join the capitalized words back into a string
+      let sentenceCasedName = sentenceCasedWords.join(" ");
 
-  return sentenceCasedName;
-},
+      return sentenceCasedName;
+    },
     calculateAge(birthDate) {
       const today = new Date();
       const bday = new Date(birthDate);
@@ -427,14 +428,14 @@ export default {
         hhSize: '',
         relToHead: '',
 
-    }
+      }
 
-    this.successDialog = true;
+      this.successDialog = true;
       setTimeout(() => {
         this.successDialog = false;
         this.residentDialog = false;
       }, 1000);
-  },
+    },
     editInfo(item) {
       this.residentDialog = true;
 
@@ -468,7 +469,7 @@ export default {
       let numberOfResidents = this.residents.length;
 
       let tableHTML = `
-        <style>
+        <style scoped>
         body {
       font-family: 'Poppins', sans-serif;
       margin: auto;
@@ -545,7 +546,7 @@ export default {
           console.error('There was an error fetching the data!', error);
         });
     },
-    },
+  },
   computed: {
     filteredItems() {
       let filteredItems = this.residents;
@@ -631,7 +632,7 @@ export default {
         case 'All':
           return [];
         case 'Age':
-          return ['Infant [0 - 1]','Toddler [2 - 4]','Child [5 - 12]','Adolescent [13 - 19]','Young Adult [20 - 34]','Middle-Aged [35 - 54]','Older Adult [55 - 64]','Senior [65 Above]',
+          return ['Infant [0 - 1]', 'Toddler [2 - 4]', 'Child [5 - 12]', 'Adolescent [13 - 19]', 'Young Adult [20 - 34]', 'Middle-Aged [35 - 54]', 'Older Adult [55 - 64]', 'Senior [65 Above]',
           ];
         case 'Gender':
           return ['Female', 'Male'];
@@ -651,7 +652,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .v-table {
   background-color: #ECEFF1;
   border-radius: 5px;

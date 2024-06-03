@@ -17,7 +17,7 @@
                 </v-col>
                 <v-col cols="4">
                     <div class="text-subtitle-1 text-medium-emphasis">Account</div>
-                    <v-text-field density="compact" placeholder="Email address" prepend-inner-icon="mdi-email-outline"
+                    <v-text-field density="compact" placeholder="Username" prepend-inner-icon="mdi-email-outline"
                         variant="outlined"></v-text-field>
 
                     <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
