@@ -19,7 +19,7 @@
 
     <v-list>
       <v-list-item class="navigationsIcons" prepend-icon="mdi-arrow-left-box" title="Log out" min-height="50"
-        to="/Login"></v-list-item>
+        to="/Landing" @click="logout()"></v-list-item>
       <v-overlay :model-value="overlay" class="align-center justify-center">
         <v-progress-circular color="primary" size="100" indeterminate></v-progress-circular>
         <img class="logo" src="/src/assets/images/logo.png" alt="logo.png">
@@ -39,7 +39,7 @@
   opacity: 90%;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   width: 90%;
   /* animation: spin 2s linear infinite; */
 }
@@ -57,6 +57,11 @@
 
 <script>
 export default {
+  props: {
+    login: {
+      type: Boolean,
+    }
+  },
   data() {
     return {
       overlay: false,
@@ -78,6 +83,9 @@ export default {
   methods: {
     getHeader(value) {
       this.header = value;
+    },
+    logout() {
+      this.$emit('logout', false);
     }
   },
   watch: {
