@@ -1,5 +1,5 @@
 <template>
-  <v-card height="auto">
+  <v-card class="h-100">
     <v-tabs
       v-model="tab"
       align-tabs="center"

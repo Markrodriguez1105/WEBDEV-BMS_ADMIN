@@ -56,8 +56,8 @@
       <v-col cols="9">
         <div class="ml-7">
           <v-table
-            class="mb-10"
-            height="480px"
+            class="mb-10 bg-grey-lighten-3"
+            height="80vh"
             max-height="700px"
             fixed-header
             :search="search"
@@ -99,26 +99,26 @@
       <v-col cols="3">
         <v-card
           
-          class="mr-5  border-e-thin border-s-thin bg-white" 
+          class="mr-5  border-e-thin border-s-thin " 
           elevation="0"
-          height="480px"
+          height="80vh"
         >
           <p
             class="text-center text-h8 py-3"
             style="background-color: #3a53a5; color: white"
-            height="480px"
+            height="80vh"
             
           >
             Information 
           </p>
           <v-card
             max-height="700"
-            class="overflow-y-auto"elevation="0"
-            height="370px"
+            class="overflow-y-auto bg-"elevation="0"
+            height="65vh"
             v-if="selectedItem"
             
           >
-            <div class="mt-4">
+            <div class="mt-4 ">
               <p class="font-weight-light ml-3 text-caption">Full Name:</p>
               <p class="font-weight-regular ml-3 mb-2 text-h8">
                 {{ selectedItem.fullName }}
@@ -184,8 +184,8 @@
           </div>
 
           <!-- Edit and Delete Button -->
-          <div class="text-center mt-4" v-if="selectedItem">
-            <div>
+          <div class="text-center mt-4 bg-grey-lighten-3" v-if="selectedItem">
+            <div class="py-8">
               <v-row justify="center">
                 <v-btn icon @click.stop="editItem(selectedItem)" style="border-radius: 0; background-color: #3a53a5; color: white;" class="rounded mx-4 margin-top: 10px">
                   <v-icon>mdi-pencil</v-icon>
@@ -509,7 +509,7 @@ export default {
 
       //SAMPLE DATA
       items: [ { 
-            id: 1,
+            id: "CC12024 23658743",
             lastName: 'Doe',
             firstName: 'John',
             middleName: 'Quincy',
@@ -529,7 +529,7 @@ export default {
             tinNo: '123-456-789',
           },
           {
-            id: 2,
+            id: "CC12024 32874576",
             lastName: 'Smith',
             firstName: 'Jane',
             middleName: 'Elizabeth',  
@@ -549,7 +549,7 @@ export default {
             tinNo: '987-654-321',
           }, 
           {
-            id: 3,
+            id: "CC12024 21097636",
             lastName: 'Brown',
             firstName: 'Michael',
             middleName: 'David',
@@ -569,7 +569,7 @@ export default {
             tinNo: '456-789-123',
           },
           {
-            id: 4,
+            id: "CC12024 21544267",
             lastName: 'Johnson',
             firstName: 'Emily',
             middleName: 'Anne',
@@ -589,7 +589,7 @@ export default {
             tinNo: '789-123-456',
           },
           {
-            id: 5,
+            id: "CC12024 21346532",
             lastName: 'Williams',
             firstName: 'Robert',
             middleName: 'James',
@@ -609,7 +609,7 @@ export default {
             tinNo: '159-753-852',
           },
           {
-            id: 6,
+            id: "CC12024 90437865",
             lastName: 'Jones',
             firstName: 'Sarah',
             middleName: 'Michelle',
@@ -629,7 +629,7 @@ export default {
             tinNo: '357-951-486',
           },
           {
-            id: 7,
+            id: "CC12024 32905478",
             lastName: 'Brown',
             firstName: 'William',
             middleName: 'Andrew',
@@ -649,7 +649,7 @@ export default {
             tinNo: '852-369-741',
           },
           {
-            id: 8,
+            id: "CC12024 43902378",
             lastName: 'Taylor',
             firstName: 'Olivia',
             middleName: 'Grace',
@@ -669,7 +669,7 @@ export default {
             tinNo: '369-852-741',
           },
           {
-            id: 9,
+            id: "CC12024 32126554",
             lastName: 'Miller',
             firstName: 'Ethan',
             middleName: 'Alexander',
@@ -689,7 +689,7 @@ export default {
             tinNo: '456-852-369',
           },
           {
-            id: 10,
+            id: "CC12024 90438932",
             lastName: 'Wilson',
             firstName: 'Sophia',
             middleName: 'Rose',
@@ -708,7 +708,107 @@ export default {
             dateIssued: '2022-10-10',
             tinNo: '258-369-147',
           },
-           
+          {
+            id: "CC12024 32905489",
+            lastName: 'Wilchan',
+            firstName: 'Kudos',
+            middleName: 'Rose',
+            address: '888 Maple St',
+            gender: 'Female',
+            birthdate: '1996-10-10',
+            paymentStatus: 'Expired',
+            height: 170,
+            weight: 65,
+            placeOfBirth: 'City J',
+            email: 'sophia.wilson@example.com',
+            contactNumber: '321789456',
+            civilStatus: 'Single',
+            occupation: 'Engineer',
+            citizenship: 'Country J',
+            dateIssued: '2022-10-10',
+            tinNo: '258-369-147',
+          },
+          {
+            id: "CC12024 89433290",
+            lastName: 'Kimmy',
+            firstName: 'Dora',
+            middleName: 'Uw',
+            address: '888 Maple St',
+            gender: 'Female',
+            birthdate: '1996-10-10',
+            paymentStatus: 'Expired',
+            height: 170,
+            weight: 65,
+            placeOfBirth: 'City J',
+            email: 'sophia.wilson@example.com',
+            contactNumber: '321789456',
+            civilStatus: 'Single',
+            occupation: 'Engineer',
+            citizenship: 'Country J',
+            dateIssued: '2022-10-10',
+            tinNo: '258-369-147',
+          },
+          {
+            id: "CC12024 32904587",
+            lastName: 'Den',
+            firstName: 'Sophia',
+            middleName: 'Kie',
+            address: '888 Maple St',
+            gender: 'Female',
+            birthdate: '1996-10-10',
+            paymentStatus: 'Expired',
+            height: 170,
+            weight: 65,
+            placeOfBirth: 'City J',
+            email: 'sophia.wilson@example.com',
+            contactNumber: '321789456',
+            civilStatus: 'Single',
+            occupation: 'Engineer',
+            citizenship: 'Country J',
+            dateIssued: '2022-10-10',
+            tinNo: '258-369-147',
+          },
+          {
+            id: "CC12024 90327854",
+            lastName: 'Wilson',
+            firstName: 'Sophia',
+            middleName: 'Rose',
+            address: '888 Maple St',
+            gender: 'Female',
+            birthdate: '1996-10-10',
+            paymentStatus: 'Expired',
+            height: 170,
+            weight: 65,
+            placeOfBirth: 'City J',
+            email: 'sophia.wilson@example.com',
+            contactNumber: '321789456',
+            civilStatus: 'Single',
+            occupation: 'Engineer',
+            citizenship: 'Country J',
+            dateIssued: '2022-10-10',
+            tinNo: '258-369-147',
+          },
+          {
+            id: "CC12024 90437832",
+            lastName: 'Ken',
+            firstName: 'Dee',
+            middleName: 'Ai',
+            address: '888 Maple St',
+            gender: 'Female',
+            birthdate: '1996-10-10',
+            paymentStatus: 'Expired',
+            height: 170,
+            weight: 65,
+            placeOfBirth: 'City J',
+            email: 'sophia.wilson@example.com',
+            contactNumber: '321789456',
+            civilStatus: 'Single',
+            occupation: 'Engineer',
+            citizenship: 'Country J',
+            dateIssued: '2022-10-10',
+            tinNo: '258-369-147',
+          },
+        
       ],
       // Validation rules (example)
         idRules: [(v) => !!v || 'Cedula Number is required'],

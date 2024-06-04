@@ -149,7 +149,7 @@
   <v-row>
     <v-col cols="9">
       <div class="ml-7">
-        <v-table class="mb-10" height="480px" max-height="700px" fixed-header search="search" hover>
+        <v-table class="mb-10" height="70vh" max-height="700px" fixed-header search="search" hover>
           <thead>
             <tr>
               <th class="text-left">
