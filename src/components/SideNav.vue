@@ -70,7 +70,7 @@ export default {
       rail: true,
       lists: [
         { icon: 'mdi-view-dashboard', text: 'Dashboard', route: '/' },
-        { icon: 'mdi-home-city', text: 'Barangay Information', route: '/BarangayInfo' },
+        // { icon: 'mdi-home-city', text: 'Barangay Information', route: '/BarangayInfo' },
         { icon: 'mdi-home-plus', text: 'Household Profiling', route: '/Household' },
         { icon: 'mdi-account-plus', text: 'Resident Profiling', route: '/Resident' },
         { icon: 'mdi-store-plus', text: 'Business Record', route: '/Business' },

@@ -136,8 +136,8 @@
           </div>
 
           <!-- Edit and Delete Button -->
-          <div class="text-center mt-4" v-if="selectedItem">
-            <div>
+          <div class="text-center mt-4 bg-grey-lighten-3" v-if="selectedItem">
+            <div class="py-8">
               <v-row justify="center">
                 <v-btn icon @click.stop="editItem(selectedItem)"
                   style="border-radius: 0; background-color: #3a53a5; color: white;"
