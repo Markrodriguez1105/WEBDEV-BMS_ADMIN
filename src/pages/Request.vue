@@ -2,7 +2,7 @@
     <div class="ma-3">
         <v-row class="d-flex justify-space-between">
             <v-col cols="auto" class="d-flex justify-start ga-3">
-                <RequestForm icon="mdi-account-multiple-plus" titleBox="New Request" />
+                <RequestForm :getReq="getReq()" icon="mdi-account-multiple-plus" titleBox="New Request" />
             </v-col>
             <v-col class="d-flex ga-2 align-center" cols="4">
                 <v-btn color="primary" flat>

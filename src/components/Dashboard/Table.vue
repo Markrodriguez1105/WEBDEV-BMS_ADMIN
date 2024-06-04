@@ -4,7 +4,7 @@
             <tr>
                 <th class="text-left">Date Request</th>
                 <th class="text-left">Resident Name</th>
-                <th class="text-left">Document type</th>
+                <th class="text-left">Certification Type</th>
                 <th class="text-left">Status</th>
             </tr>
         </thead>
