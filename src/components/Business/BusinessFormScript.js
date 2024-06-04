@@ -412,7 +412,11 @@ export default {
         let pattern;
         if (field === "business_name") {
           pattern = /^[a-zA-Z0-9\s'-]+$/; // Allow letters, numbers, spaces, hyphens, and apostrophes for business_name
-        } else {
+        } else if (field === "address") {
+          pattern = /^[a-zA-Z0-9\s,.-]+$/; // Allow letters, numbers, spaces, hyphens, and apostrophes for business_name
+        }
+        
+        else {
           pattern = /^[a-zA-Z\s'-]+$/; // Allow only letters, spaces, hyphens, and apostrophes for other text fields
         }
         if (!pattern.test(business[field])) {
