@@ -2,7 +2,6 @@
   <v-card flat>
     <v-row class="d-flex justify-space-between align-center">
       <v-btn color="primary" @click="addItem" class="add-btn">Add</v-btn>
-      
 
       <label for="vatStatusFilter" class="filter2">VAT Status:</label>
       <select v-model="vatStatusFilter">
@@ -10,7 +9,7 @@
         <option value="registered">Registered</option>
         <option value="not_registered">Not Registered</option>
       </select>
-      
+
       <label for="activeStatusFilter" class="filter1">Active Status:</label>
       <select v-model="activeStatusFilter" class="">
         <option value="all">Show All</option>
@@ -45,7 +44,9 @@
           <td>{{ item.active_status }}</td>
           <td class="action-icons">
             <v-icon @click="editItem(item)" color="green">mdi-pencil</v-icon>
-            <v-icon @click="deleteItem(item)" color="red darken-1">mdi-delete</v-icon>
+            <v-icon @click="deleteItem(item)" color="red darken-1"
+              >mdi-delete</v-icon
+            >
             <v-icon @click.stop="showDetails(item)"
               >mdi-format-list-bulleted</v-icon
             >
@@ -72,7 +73,9 @@
     <!-- Add Form Dialog -->
     <v-dialog v-model="showAddDialog" max-width="600px">
       <v-card>
-        <v-card-title style="background-color: #3a53a5; color: white;">Add Business</v-card-title>
+        <v-card-title style="background-color: #3a53a5; color: white"
+          >Add Business</v-card-title
+        >
         <v-card-text>
           <v-container>
             <v-row>
@@ -91,25 +94,32 @@
                   required
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
+              <v-col cols="12" sm="3">
                 <v-text-field
                   v-model="newBusiness.first_name"
                   label="First Name"
                   required
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
+              <v-col cols="12" sm="3">
                 <v-text-field
                   v-model="newBusiness.middle_name"
                   label="Middle Name"
                   required
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
+              <v-col cols="12" sm="3">
                 <v-text-field
                   v-model="newBusiness.last_name"
                   label="Last Name"
                   required
+                  aria-errormessage="Add lastname"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="3">
+                <v-text-field
+                  v-model="newBusiness.middle_initial"
+                  label="Middle Initial"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
@@ -163,8 +173,7 @@
                   required
                 ></v-text-field>
               </v-col>
-              
-              
+
               <v-col cols="12" sm="6">
                 <v-menu
                   v-model="addDateEstablishedPicker"
@@ -189,14 +198,13 @@
                   ></v-date-picker>
                 </v-menu>
               </v-col>
-                <v-col cols="12" sm="12">
+              <v-col cols="12" sm="12">
                 <v-text-field
                   v-model="newBusiness.tin"
                   label="Tin Number"
                   required
                 ></v-text-field>
               </v-col>
-              
             </v-row>
           </v-container>
         </v-card-text>
@@ -211,7 +219,9 @@
     <!-- Delete dialog-->
     <v-dialog v-model="dialogDelete" max-width="500px">
       <v-card>
-        <v-card-title style="background-color: #3a53a5; color: white;">Are you sure you want to delete this item?</v-card-title>  
+        <v-card-title style="background-color: #3a53a5; color: white"
+          >Are you sure you want to delete this item?</v-card-title
+        >
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="red darken-1" variant="text" @click="closeDelete"
@@ -228,7 +238,9 @@
     <!-- Edit Form Dialog -->
     <v-dialog v-model="showEditDialog" max-width="600px">
       <v-card>
-        <v-card-title style="background-color: #3a53a5; color: white;">Update Form</v-card-title>
+        <v-card-title style="background-color: #3a53a5; color: white"
+          >Update Form</v-card-title
+        >
         <v-card-text>
           <v-container>
             <v-row>
@@ -245,22 +257,28 @@
                   label="Business Type"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
+              <v-col cols="12" sm="3">
                 <v-text-field
                   v-model="selectedBusiness.first_name"
                   label="First Name"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
+              <v-col cols="12" sm="3">
                 <v-text-field
                   v-model="selectedBusiness.middle_name"
                   label="Middle Name"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="4">
+              <v-col cols="12" sm="3">
                 <v-text-field
                   v-model="selectedBusiness.last_name"
                   label="Last Name"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="3">
+                <v-text-field
+                  v-model="selectedBusiness.middle_initial"
+                  label="Middle Initial"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6">
@@ -324,9 +342,11 @@
     </v-dialog>
 
     <!-- Details Dialog -->
-    <v-dialog v-model="showDetailsDialog" max-width="700px">
+    <v-dialog v-model="showDetailsDialog" max-width="800px">
       <v-card>
-        <v-card-title style="background-color: #3a53a5; color: white;">Details</v-card-title>
+        <v-card-title style="background-color: #3a53a5; color: white"
+          >Details</v-card-title
+        >
         <v-card-text>
           <v-container>
             <v-row>
@@ -343,22 +363,19 @@
                   {{ selectedBusiness.business_type }}
                 </p>
               </v-col>
-              <v-col cols="12" sm="4">
+
+              <v-col cols="12" sm="6">
                 <p>
-                  <strong>First Name:</strong> {{ selectedBusiness.first_name }}
+                    <strong>Name:</strong> {{ selectedBusiness.last_name }},
+                    {{ selectedBusiness.first_name }}
+                    {{ selectedBusiness.middle_name }}
+                    <template v-if="selectedBusiness.middle_initial">
+                        {{ selectedBusiness.middle_initial }}.
+                    </template>
                 </p>
-              </v-col>
-              <v-col cols="12" sm="4">
-                <p>
-                  <strong>Middle Name:</strong>
-                  {{ selectedBusiness.middle_name }}
-                </p>
-              </v-col>
-              <v-col cols="12" sm="4">
-                <p>
-                  <strong>Last Name:</strong> {{ selectedBusiness.last_name }}
-                </p>
-              </v-col>
+            </v-col>
+            
+
               <v-col cols="12" sm="6">
                 <p>
                   <strong>Monthly Income:</strong>
@@ -377,16 +394,17 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <p>
-                  <strong>Contact Number:</strong>
+                  <strong>Contact Number: </strong>+63
                   {{ selectedBusiness.owner_phone_num }}
                 </p>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" sm="6">
                 <p>
-                  <strong>Email:</strong> {{ selectedBusiness.owner_email }}
+                  <strong>Email:</strong>
+                  {{ selectedBusiness.owner_email }}
                 </p>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" sm="6">
                 <p><strong>Address:</strong> {{ selectedBusiness.address }}</p>
               </v-col>
               <v-col cols="12" sm="6">
@@ -423,3 +441,4 @@
 <script src="./BusinessFormScript.js"></script>
 
 <style src="./BusinessFormStyle.css" scoped></style>
+

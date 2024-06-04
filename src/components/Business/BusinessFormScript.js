@@ -16,26 +16,6 @@ export default {
         { key: "active_status", title: "Status" },
         { key: "actions", title: "Actions" },
       ],
-      validationRules: {
-        requiredFields: [
-          "business_id",
-          "barangay_id",
-          "business_name",
-          "business_type",
-          "monthly_income",
-          "vat_status",
-          "active_status",
-          "first_name",
-          "middle_name",
-          "last_name",
-          "owner_phone_num",
-          "address",
-          "date_establishment",
-          "tin",
-          "num_employees",
-          "owner_email",
-        ],
-      },
       businessRecords: [],
       showDetailsDialog: false,
       showEditDialog: false,
@@ -51,6 +31,7 @@ export default {
         first_name: "",
         middle_name: "",
         last_name: "",
+        middle_initial: "", // Added middle_initial field
         owner_phone_num: "",
         address: "",
         monthly_income: "",
@@ -133,6 +114,7 @@ export default {
           console.error("There was an error fetching the data!", error);
         });
     },
+
     edit(selected) {
       selected.action = "update"; // Add the action property
       axios
@@ -175,93 +157,75 @@ export default {
           console.error("Error deleting record:", error);
         });
     },
-    submit() {
-      // Validate the newBusiness object
-      if (
-        !this.newBusiness.business_id ||
-        !this.newBusiness.barangay_id ||
-        !this.newBusiness.business_name ||
-        !this.newBusiness.business_type ||
-        !this.newBusiness.first_name ||
-        !this.newBusiness.middle_name ||
-        !this.newBusiness.last_name ||
-        !this.newBusiness.owner_phone_num ||
-        !this.newBusiness.address ||
-        !this.newBusiness.monthly_income ||
-        !this.newBusiness.date_establishment ||
-        !this.newBusiness.tin ||
-        !this.newBusiness.vat_status ||
-        !this.newBusiness.num_employees ||
-        !this.newBusiness.owner_email ||
-        !this.newBusiness.active_status
-      ) {
-        alert("Please fill in all required fields.");
-        return;
-      }
-
-      // Send a POST request to the server to add a new business
-      axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/crud.php", {
-          action: "insert",
-          business_id: null,
-          barangay_id: this.newBusiness.business_id,
-          business_name: this.newBusiness.business_name,
-          business_type: this.newBusiness.businessType,
-          first_name: this.newBusiness.first_name,
-          middle_name: this.newBusiness.middle_name,
-          last_name: this.newBusiness.last_name,
-          owner_phone_num: this.newBusiness.owner_phone_num,
-          address: this.newBusiness.address,
-          monthly_income: this.newBusiness.monthly_income,
-          date_established: this.newBusiness.date_establishment,
-          tin: this.newBusiness.tin,
-          vat_status: this.newBusiness.vat_status,
-          num_employees: this.newBusiness.num_employees,
-          date_registered: this.newBusiness.date_registered,
-          owner_email: this.newBusiness.owner_email,
-          active_status: this.newBusiness.active_status,
-        })
-        .then((response) => {
-          // Log the response
-          console.log(response);
-          // Clear the newBusiness object
-          this.newBusiness = {};
-          // Fetch the updated list of businesses
-          this.fetchBusinessRecords();
-        })
-        .catch((error) => {
-          // Log the error
-          console.error("Error inserting record:", error);
-        });
-    },
-
-    saveAdd() {
+    
+    validateAllFields(business) {
       // Required fields
       const requiredFields = [
-        'business_name',
-        'business_type',
-        'first_name',
-        'middle_name',
-        'last_name',
-        'owner_phone_num',
-        'address',
-        'monthly_income',
-        'date_establishment',
-        'tin',  
-        'vat_status',
-        'num_employees',
-        'owner_email',
-        'active_status'
+        "business_name",
+        "business_type",
+        "first_name",
+        "middle_name",
+        "last_name",
+        "owner_phone_num",
+        "address",
+        "monthly_income",
+        "date_establishment",
+        "tin",
+        "num_employees",
+        "owner_email",
       ];
     
       // Check if any required field is empty
-      const missingFields = requiredFields.filter(field => !this.newBusiness[field]);
+      const missingFields = requiredFields.filter(
+        (field) => !business[field]
+      );
     
       if (missingFields.length > 0) {
         console.error("Missing required fields:", missingFields.join(", "));
         alert("Please fill in all required fields.");
-        return;
+        return false;
       }
+
+      // Validate text fields
+      const textFields = [
+        "business_name",
+        "business_type",
+        "first_name",
+        "middle_name",
+        "last_name",
+        "address",
+      ];
+      if (!this.validateTextFields(business, textFields)) {
+        alert("Text fields can only contain letters");
+        return false;
+      }
+    
+      // Validate email and phone number
+      if (!this.validateEmail(business.owner_email)) {
+        alert("Please enter a valid email address.");
+        return false;
+      }
+      if (!this.validatePhoneNumber(business.owner_phone_num)) {
+        alert("Please enter a valid phone number.");
+        return false;
+      }
+    
+      // Ensure monthly income and num_employees are valid numbers
+      if (isNaN(business.monthly_income) || isNaN(business.num_employees)) {
+        alert("Monthly income and number of employees must be valid numbers.");
+        return false;
+      }
+      
+      if (!this.validateTin(business.tin)) {
+        alert("TIN number must be exactly 9 digits.");
+        return false;
+      }
+
+      return true;
+    },
+
+    saveAdd() {
+      if (!this.validateAllFields(this.newBusiness)) return;
     
       // Increment business ID by 1 based on the length of businessRecords array
       this.newBusiness.business_id = this.businessRecords.length + 1;
@@ -299,58 +263,10 @@ export default {
           console.error("Error inserting record:", error);
         });
     },
-    
-
-    cancelAdd() {
-      // Reset the newBusiness object and hide the add dialog
-      this.resetNewBusiness();
-      this.showAddDialog = false;
-    },
-
-    resetNewBusiness() {
-      this.newBusiness = {
-        business_id: null,
-        barangay_id: 0,
-        business_name: "",
-        business_type: "",
-        first_name: "",
-        middle_name: "",
-        last_name: "",
-        owner_phone_num: "",
-        address: "",
-        monthly_income: "",
-        date_establishment: "",
-        tin: "",
-        vat_status: "",
-        num_employees: "",
-        date_registered: "",
-        owner_email: "",
-        active_status: "",
-      };
-    },
-
-    addItem() {
-      // Reset the newBusiness object
-      this.newBusiness = {
-        monthly_income: "",
-        vat_status: "",
-        active_status: "",
-        owner_phone_num: "",
-        owner_email: "",
-        address: "",
-        num_employees: "",
-        tin: "",
-        date_establishment: "",
-        date_registered: "",
-        barangay_id: 0,
-        business_id: 0,
-      };
-      this.resetNewBusiness();
-      // Show the add form dialog
-      this.showAddDialog = true;
-    },
 
     saveEdit() {
+      if (!this.validateAllFields(this.selectedBusiness)) return;
+
       // Find the index of the edited item in the businessRecords array
       const index = this.businessRecords.findIndex(
         (record) => record.business_id === this.selectedBusiness.business_id
@@ -368,6 +284,41 @@ export default {
       this.showEditDialog = false;
     },
 
+    cancelAdd() {
+      // Reset the newBusiness object and hide the add dialog
+      this.resetNewBusiness();
+      this.showAddDialog = false;
+    },
+
+    resetNewBusiness() {
+      this.newBusiness = {
+        business_id: null,
+        barangay_id: 0,
+        business_name: "",
+        business_type: "",
+        first_name: "",
+        middle_name: "",
+        last_name: "",
+        middle_initial: "", // Added middle_initial field
+        owner_phone_num: "",
+        address: "",
+        monthly_income: "",
+        date_establishment: "",
+        tin: "",
+        vat_status: "",
+        num_employees: "",
+        date_registered: "",
+        owner_email: "",
+        active_status: "",
+      };
+    },
+
+    addItem() {
+      this.resetNewBusiness();
+      // Show the add form dialog
+      this.showAddDialog = true;
+    },
+
     cancelEdit() {
       // Reset the selected business and close the edit dialog
       this.selectedBusiness = {};
@@ -376,9 +327,6 @@ export default {
     editItem(item) {
       // Set selectedBusiness to the item being edited
       this.selectedBusiness = { ...item };
-
-      // Call the edit method to save changes to the database
-      this.edit(this.selectedBusiness);
 
       // Set showEditDialog to true to display the edit dialog
       this.showEditDialog = true;
@@ -426,6 +374,8 @@ export default {
           return "First Name";
         case "middle_name":
           return "Middle Name";
+        case "middle_initial":
+          return "Middle Initial"; // Added middle_initial field
         case "last_name":
           return "Last Name";
         case "num_employees":
@@ -446,6 +396,37 @@ export default {
           return key; // Use the key as label if not specified
       }
     },
+
+    validateEmail(email) {
+      const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+      return emailPattern.test(email);
+    },
+
+    validatePhoneNumber(phone) {
+      const phonePattern = /^(09|\+639|9)\d{8,9}$/; // Modified to accept 9 or 10 digits
+      return phonePattern.test(phone);
+    },
+
+    validateTextFields(business, fields) {
+      for (let field of fields) {
+        let pattern;
+        if (field === "business_name") {
+          pattern = /^[a-zA-Z0-9\s'-]+$/; // Allow letters, numbers, spaces, hyphens, and apostrophes for business_name
+        } else {
+          pattern = /^[a-zA-Z\s'-]+$/; // Allow only letters, spaces, hyphens, and apostrophes for other text fields
+        }
+        if (!pattern.test(business[field])) {
+          console.error(`Invalid text in field ${field}:`, business[field]);
+          return false;
+        }
+      }
+      return true;
+    },
+
+    validateTin(tin) {
+      const tinPattern = /^\d{9}$/;
+      return tinPattern.test(tin);
+    }
   },
   created() {
     // Fetch business records from the backend when the component is created
