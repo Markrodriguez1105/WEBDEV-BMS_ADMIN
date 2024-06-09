@@ -67,5 +67,17 @@ if ($req) {
             }
             $stmt->close();
             break;
+        case 'cedulaValidate':
+            $stmt = $conn->prepare("SELECT * FROM cedula WHERE resident_id = ?");
+            $stmt->bind_param("s", $req->id);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                echo json_encode(true);
+            } else {
+                echo json_encode(false);
+            }
+            $stmt->close();
+            break;
     }
 }

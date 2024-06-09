@@ -18,7 +18,7 @@
                 <v-col cols="4">
                     <div class="text-subtitle-1 text-medium-emphasis">Account</div>
                     <v-text-field density="compact" placeholder="Username" prepend-inner-icon="mdi-email-outline"
-                        variant="outlined"></v-text-field>
+                        variant="outlined" v-model="username"></v-text-field>
 
                     <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
                         Password
@@ -31,10 +31,10 @@
                     <v-text-field :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
                         :type="visible ? 'text' : 'password'" density="compact" placeholder="Enter your password"
                         prepend-inner-icon="mdi-lock-outline" variant="outlined"
-                        @click:append-inner="visible = !visible"></v-text-field>
+                        @click:append-inner="visible = !visible" v-model="password"></v-text-field>
 
-                    <v-btn class="mb-8" color="blue" size="large" variant="tonal" block @click="submit()">
-                        Log In
+                    <v-btn class="mb-8" :color="msgColor" size="large" variant="tonal" block @click="submit()">
+                        {{ msg }}
                     </v-btn>
                 </v-col>
             </v-row>
@@ -58,48 +58,48 @@
             <v-row>
                 <v-col>
                     <v-card>
-                        <v-img src="/src/assets/images/blood.jpg" class="align-end" gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                            height="200px" cover>
+                        <v-img src="/src/assets/images/blood.jpg" class="align-end"
+                            gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" height="200px" cover>
                             <v-card-title class="text-white">Blood Donation</v-card-title>
                         </v-img>
                     </v-card>
                 </v-col>
                 <v-col>
                     <v-card>
-                        <v-img src="/src/assets/images/CleanUpDrive.png" class="align-end" gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                            height="200px" cover>
+                        <v-img src="/src/assets/images/CleanUpDrive.png" class="align-end"
+                            gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" height="200px" cover>
                             <v-card-title class="text-white">Clean Up Drive</v-card-title>
                         </v-img>
                     </v-card>
                 </v-col>
                 <v-col>
                     <v-card>
-                        <v-img src="/src/assets/images/feed.jpg" class="align-end" gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                            height="200px" cover>
+                        <v-img src="/src/assets/images/feed.jpg" class="align-end"
+                            gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" height="200px" cover>
                             <v-card-title class="text-white">Feeding Program</v-card-title>
                         </v-img>
                     </v-card>
                 </v-col>
                 <v-col>
                     <v-card>
-                        <v-img src="/src/assets/images/blood.jpg" class="align-end" gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                            height="200px" cover>
+                        <v-img src="/src/assets/images/blood.jpg" class="align-end"
+                            gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" height="200px" cover>
                             <v-card-title class="text-white">Blood Donation</v-card-title>
                         </v-img>
                     </v-card>
                 </v-col>
                 <v-col>
                     <v-card>
-                        <v-img src="/src/assets/images/CleanUpDrive.png" class="align-end" gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                            height="200px" cover>
+                        <v-img src="/src/assets/images/CleanUpDrive.png" class="align-end"
+                            gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" height="200px" cover>
                             <v-card-title class="text-white">Clean Up Drive</v-card-title>
                         </v-img>
                     </v-card>
                 </v-col>
                 <v-col>
                     <v-card>
-                        <v-img src="/src/assets/images/feed.jpg" class="align-end" gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-                            height="200px" cover>
+                        <v-img src="/src/assets/images/feed.jpg" class="align-end"
+                            gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)" height="200px" cover>
                             <v-card-title class="text-white">Feeding Program</v-card-title>
                         </v-img>
                     </v-card>
@@ -109,21 +109,40 @@
     </div>
 </template>
 <script>
+import axios from 'axios';
 
 export default {
-    props: {
-        login: {
-            type: Boolean,
-        }
-    },
+    emits: ['login'],
     data() {
         return {
             visible: false,
+            password: '',
+            username: '',
+            msg: 'Log In',
+            msgColor: 'blue',
         }
     },
     methods: {
         submit() {
-            this.$emit('login', true);
+            axios.post('http://localhost/bms/src/php/login.php', {
+                username: this.username,
+                password: this.password,
+            }).then(response => {
+                if (response.data) {
+                    console.log(response.data);
+                    this.$emit('login', response.data);
+                } else {
+                    this.invalidLogin();
+                }
+            });
+        },
+        invalidLogin() {
+            this.msg = 'Invalid';
+            this.msgColor = 'red';
+            setTimeout(() => {
+                this.msg = 'Log In';
+                this.msgColor = 'blue';
+            }, 1000);
         }
     },
 }

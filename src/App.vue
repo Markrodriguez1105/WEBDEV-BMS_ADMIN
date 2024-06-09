@@ -1,10 +1,10 @@
 <template>
   <v-app>
-    <v-main v-if="access">
-      <SideNav @logout="login($event)" />
-      <v-content>
-        <router-view />
-      </v-content>
+    <v-main v-if="user.admin_id">
+      <SideNav @logout="login($event)" :user="user"/>
+      <div>
+        <router-view :user="user" />
+      </div>
     </v-main>
     <v-main v-else>
       <Landing @login="login($event)" />
@@ -13,17 +13,26 @@
 </template>
 <script>
 
-export default{
-  data(){
-    return{
-      access: true,
+export default {
+  data() {
+    return {
+      access: false,
+      user: {
+        admin_id: '',
+        postion_id: '',
+        description: '',
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        suffix: '',
+      },
     }
   },
   methods: {
-    login(value){
-      this.access = value;
+    login(value) {
+      this.user = value;
     },
-    logout(value){
+    logout(value) {
       this.access = value;
     }
   }

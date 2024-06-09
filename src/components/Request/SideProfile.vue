@@ -30,7 +30,7 @@
                 <v-menu activator="parent">
                     <v-list>
                         <v-list-item v-if="selectedRow.payment_status == 'Pending'">
-                            <v-btn class="w-100" flat color="primary">Payment</v-btn>
+                            <RequestPayment :selectedRow="selectedRow" titleBox="Payment" icon="mdi-cash" />
                         </v-list-item>
                         <v-list-item v-if="selectedRow.payment_status != 'Pending'">
                             <v-btn class="w-100" flat color="primary">Print</v-btn>

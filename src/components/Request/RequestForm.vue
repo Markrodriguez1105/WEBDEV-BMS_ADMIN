@@ -103,7 +103,6 @@ export default {
     props: {
         getReq: {
             type: Function,
-            required: true
         },
         selectedRow: {
             type: Object,
@@ -140,7 +139,7 @@ export default {
     }),
     methods: {
         submit() {
-            axios.post('http://localhost/bms_php/insert.php', {
+            axios.post('http://localhost/bms/src/php/Request/insert.php', {
                 action: 'insert',
                 certification: this.doc.certification_id,
                 resident_id: this.doc.resident_id.id,
@@ -152,7 +151,7 @@ export default {
                 console.log(response.data);
             });
 
-            axios.post('http://localhost/bms_php/insert.php', {
+            axios.post('http://localhost/bms/src/php/Request/insert.php', {
                 action: 'insertPayment',
                 certification: this.doc.certification_id,
                 document_cost: this.doc.document_cost,
@@ -205,21 +204,21 @@ export default {
             this.doc.certification_id = id;
         },
         getResident() {
-            axios.post('http://localhost/bms_php/fetch.php', {
+            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'getAll',
             }).then(response => {
                 this.names = response.data;
             })
         },
         getDocuments() {
-            axios.post('http://localhost/bms_php/fetch.php', {
+            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'getDocs',
             }).then(response => {
                 this.documents = response.data;
             })
         },
         cedulaValidate(){
-            axios.post('http://localhost/bms_php/fetch.php', {
+            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'cedulaValidate',
                 id: this.doc.resident_id.id,
             }).then(response => {
@@ -242,7 +241,6 @@ export default {
         }
     },
     mounted() {
-        this.genDocId();
         this.genDocId();
         this.setForm();
         this.getResident();

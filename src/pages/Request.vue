@@ -41,11 +41,24 @@
             </v-col>
         </v-row>
     </div>
+    <!-- <div v-else>
+        <v-main class="d-flex align-center justify-center" style="min-height: 80vh;">
+            <v-alert title="System Warning" prominent max-width="50%"
+                text="Restricted Access to this Page, this page is accessible by Secretary Only."
+                type="warning" variant="tonal">
+            </v-alert>
+        </v-main>
+    </div> -->
 </template>
 <script>
 import axios from 'axios';
 
 export default {
+    props: {
+        user: {
+            type: Object,
+        }
+    },
     data() {
         return {
             search: '',
@@ -62,10 +75,9 @@ export default {
             this.showOnlyDocumentType = item;
         },
         getReq() {
-            axios.post('http://localhost/bms_php/fetch.php', {
+            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'getReq',
             }).then(response => {
-                console.log(response.data);
                 this.document = response.data;
             })
         }
@@ -100,7 +112,7 @@ export default {
             return filteredDocs;
         }
     },
-    mounted(){
+    mounted() {
         this.getReq();
     }
 }

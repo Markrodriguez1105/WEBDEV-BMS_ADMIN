@@ -20,16 +20,28 @@ $req = json_decode(file_get_contents("php://input"));
 echo json_encode($req);
 if ($req) {
 
-    if($req->action == 'insert'){
+    if ($req->action == 'insert') {
         $stmt = $conn->prepare("INSERT INTO certification (certification_id, resident_id, phone_num, email, document_id, purpose) VALUES (?, ?, ?, ?, ?, ?);");
         $stmt->bind_param("ssssss", $req->certification, $req->resident_id, $req->phone_num, $req->email, $req->document_type, $req->purpose);
-        
-        if($stmt->execute()){
+
+        if ($stmt->execute()) {
             echo json_decode("Success");
-        }else{
+        } else {
             echo json_decode("Failed");
         }
         $stmt->close();
     }
+
+    if ($req->action == 'insertPayment') {
+        $stmt = $conn->prepare("INSERT INTO `certificationtreasury` (`document_id`, `stamp_fee`, `document_cost`, `fee`) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $req->certification, $req->stamp_fee, $req->document_cost, $req->fee);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            echo json_encode(['success' => false, 'error' => $stmt->error]);
+        }
+        $stmt->close();
+    }
+
     $conn->close();
 }
