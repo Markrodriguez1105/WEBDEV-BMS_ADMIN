@@ -1,11 +1,11 @@
 <template>
-  <v-row class="mt-1 d-flex justify-space-between">
+  <v-row class="d-flex justify-space-between" max-height="40vh">
     <v-col cols="4" class="d-flex ga-3 ml-8">
       <v-select width="95px" style="width: 100px;" v-model="CategoryName" label="Category" density="compact"
-        :items="['All', ' Age', 'Gender', 'Zone', 'Civil Status']" variant="outlined"></v-select>
+        :items="['All', 'Age', 'Gender', 'Zone', 'Civil Status']" value="All" variant="outlined"></v-select>
 
-      <v-select width="500" style="width: 100px;" v-model="Group" label="Group" density="compact"
-        :items="filteredGroups" variant="outlined"></v-select>
+      <v-select style="width: 100px;" v-model="Group" label="Group" density="compact" :items="filteredGroups"
+        variant="outlined"></v-select>
 
       <v-menu open-on-hover>
         <template v-slot:activator="{ props }">
@@ -36,98 +36,108 @@
       <v-card class="px-3 bg-grey-lighten-4" max-width="1000" max-height="900" prepend-icon="mdi-account"
         title="Add Resident">
 
-        <v-row class="ms-1 mt-3">
-          <div class="bg-indigo-darken-3 w-100 mr-3">
-            <h2 class="mx-3">Personal Information</h2>
-          </div>
-        </v-row>
-        <!-- Personal Info -->
 
-        <v-row>
-          <v-col class="d-flex mt-3">
-            <v-text-field v-model="resident.firstName" label="First name" variant="outlined"
-              :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
-            <v-text-field v-model="resident.middleName" class="ms-3" label="Middle name" variant="outlined"
-              :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
-            <v-text-field v-model="resident.lastName" class="ms-3" label="Last name" variant="outlined"
-              :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
-            <v-text-field v-model="resident.suffix" class="ms-3" style="width: 10px;" label="Suffix"
-              variant="outlined"></v-text-field>
-          </v-col>
-        </v-row>
+        <!-- Add Resident Form -->
+        <v-form @submit.prevent>
 
-        <v-row>
-          <v-col class="d-flex">
-            <v-select v-model="resident.gender" width="500" style="width: 85px;" label="Gender"
-              :items="['Female', 'Male']" variant="outlined" :rules="[rules.required]"></v-select>
-            <v-text-field v-model="resident.birthDate" class="ms-3 shrink" style="width: 85px;" label="Birth Date"
-              variant="outlined" type="date" :rules="[rules.required, rules.birthDate]" clearable></v-text-field>
-            <v-text-field v-model="resident.age" :value="calculateAge(resident.birthDate)" focused  class="ms-3"
-              label="Age" variant="outlined" readonly></v-text-field>
-          </v-col>
-        </v-row>
+          <v-row class="ms-1 mt-3">
+            <div class="bg-indigo-darken-3 w-100 mr-3">
+              <h2 class="mx-3">Personal Information</h2>
+            </div>
+          </v-row>
+          <!-- Personal Info -->
 
-        <v-row>
-          <v-col class="d-flex">
-            <v-text-field v-model="resident.nationality" label="Nationality" variant="outlined"
-              :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
-            <v-text-field v-model="resident.religion" class="ms-3" label="Religion" variant="outlined"
-              :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
-            <v-text-field v-model="resident.email" class="ms-3" style="width: 85px;" label="Email" variant="outlined"
-              suffix="@gmail.com" :rules="[rules.required]"></v-text-field>
-          </v-col>
-        </v-row>
+          <v-row>
+            <v-col class="d-flex mt-3">
+              <v-text-field v-model="resident.firstName" label="First name" variant="outlined"
+                :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
+              <v-text-field v-model="resident.middleName" class="ms-3" label="Middle name" variant="outlined"
+                :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
+              <v-text-field v-model="resident.lastName" class="ms-3" label="Last name" variant="outlined"
+                :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
+              <v-text-field v-model="resident.suffix" class="ms-3" style="width: 10px;" label="Suffix"
+                variant="outlined"></v-text-field>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col class="d-flex">
+              <v-select v-model="resident.gender" width="500" style="width: 85px;" label="Gender"
+                :items="['Female', 'Male']" variant="outlined" :rules="[rules.required]"></v-select>
+              <v-text-field v-model="resident.birthDate" class="ms-3 shrink" style="width: 85px;" label="Birth Date"
+                variant="outlined" type="date" :rules="[rules.required, rules.birthDate]" clearable></v-text-field>
+              <v-text-field v-model="resident.age" :value="calculateAge(resident.birthDate)" focused class="ms-3"
+                label="Age" variant="outlined" readonly></v-text-field>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col class="d-flex">
+              <v-text-field v-model="resident.nationality" label="Nationality" variant="outlined"
+                :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
+              <v-text-field v-model="resident.religion" class="ms-3" label="Religion" variant="outlined"
+                :rules="[rules.required, rules.minLength, rules.lettersOnly]"></v-text-field>
+              <v-text-field v-model="resident.email" class="ms-3" style="width: 85px;" label="Email" variant="outlined"
+                suffix="@gmail.com" :rules="[rules.required]"></v-text-field>
+            </v-col>
+          </v-row>
 
 
-        <v-row>
-          <v-col class="d-flex">
-            <v-select v-model="resident.civStat" width="500" style="width: 100px;" label="Civil Status"
-              :items="['Single', 'Married', 'Annulled', 'Widowed', 'Live-in']" variant="outlined"
-              :rules="[rules.required]"></v-select>
-            <v-select v-model="resident.votStat" width="500" class="ms-3" style="width: 100px;" label="Voter Status"
-              :items="['Voter', 'Not Voter Yet']" variant="outlined" :rules="[rules.required]"></v-select>
-            <v-select v-model="resident.zone" width="500" class="ms-3" style="width: 100px;" label="Zone"
-              :items="['1', '2', '3', '4', '5', '6', '7']" variant="outlined" :rules="[rules.required]"></v-select>
-          </v-col>
-        </v-row>
+          <v-row>
+            <v-col class="d-flex">
+              <v-select v-model="resident.civStat" width="500" style="width: 100px;" label="Civil Status"
+                :items="['Single', 'Married', 'Annulled', 'Widowed', 'Live-in']" variant="outlined"
+                :rules="[rules.required]"></v-select>
+              <v-select v-model="resident.votStat" width="500" class="ms-3" style="width: 100px;" label="Voter Status"
+                :items="['Voter', 'Not Voter Yet']" variant="outlined" :rules="[rules.required]"></v-select>
+              <v-select v-model="resident.zone" width="500" class="ms-3" style="width: 100px;" label="Zone"
+                :items="['1', '2', '3', '4', '5', '6', '7']" variant="outlined" :rules="[rules.required]"></v-select>
+            </v-col>
+          </v-row>
 
-        <v-row>
-          <v-col>
-            <v-text-field v-model="resident.contactNum" label="Phone Number" style="width: 310px;" variant="outlined"
-              prefix="+63" counter="10" maxlength="10"
-              :rules="[rules.required, rules.maxLength, rules.phoneNum, rules.numeric]">
-            </v-text-field>
-          </v-col>
-        </v-row>
+          <v-row>
+            <v-col>
+              <v-text-field v-model="resident.contactNum" label="Phone Number" style="width: 310px;" variant="outlined"
+                prefix="+63" counter="10" maxlength="10"
+                :rules="[rules.required, rules.maxLength, rules.phoneNum, rules.numeric]">
+              </v-text-field>
+            </v-col>
+          </v-row>
 
-        <v-row class="ms-1">
-          <div class="bg-indigo-darken-3 w-100 mr-3">
-            <h2 class="mx-3">Household Information</h2>
-          </div>
-        </v-row>
-        <!-- Household Info -->
+          <v-row class="ms-1">
+            <div class="bg-indigo-darken-3 w-100 mr-3">
+              <h2 class="mx-3">Household Information</h2>
+            </div>
+          </v-row>
+          <!-- Household Info -->
 
-        <v-row>
-          <v-col class="d-flex">
-            <v-select v-model="resident.hhHead" label="Household Head" variant="outlined"
-              :rules="rules.required"></v-select>
-            <v-text-field v-model="resident.hhSize" class="ms-3" label="Household Size" variant="outlined"
-              readonly></v-text-field>
-            <v-text-field v-model="resident.relToHead" class="ms-3" label="Relation to Head" variant="outlined"
-              readonly></v-text-field>
-          </v-col>
-        </v-row>
+          <v-row>
+            <v-col class="d-flex">
+              <v-select v-model="resident.hhHead" label="Household Head" variant="outlined"
+                :rules="rules.required"></v-select>
+              <v-text-field v-model="resident.hhSize" class="ms-3" label="Household Size" variant="outlined"
+                readonly></v-text-field>
+              <v-text-field v-model="resident.relToHead" class="ms-3" label="Relation to Head" variant="outlined"
+                readonly></v-text-field>
+            </v-col>
+          </v-row>
 
-        <template v-slot:actions>
-          <v-btn class="my-5 bg-grey-lighten-4 " size="large" @click="residentDialog = false">
-            Cancel
-          </v-btn>
+          <v-row>
+            <v-col cols="12" class="d-flex justify-end ga-3">
+              <v-btn class="my-5 bg-grey-lighten-4 " size="large" @click="residentDialog = false">
+                Cancel
+              </v-btn>
 
-          <v-btn class="my-5 bg-green-darken-1 px-5" size="large" @click="submitClicked" type="submit">
-            Submit
-          </v-btn>
+              <v-btn class="my-5 bg-green-darken-1 px-5" size="large" @click="submitClicked" type="submit">
+                Submit
+              </v-btn>
+            </v-col>
 
-        </template>
+          </v-row>
+
+        </v-form>
+
+
 
         <v-dialog v-model="resident.successDialog" width="500">
           <v-card class="px-3 bg-grey-lighten-4" width="500" height="250" prepend-icon="mdi-success" title="Success">
@@ -141,11 +151,15 @@
     </v-dialog>
 
     <v-col cols="3">
-      <v-text-field class=" mt-0 mr-5" v-model="search" label="Search" density="comfortable "
-        append-inner-icon="mdi-magnify" variant="solo" single-line clearable></v-text-field>
+      <v-text-field class=" mr-5" v-model="search" label="Search" density="comfortable " append-inner-icon="mdi-magnify"
+        variant="solo" single-line clearable></v-text-field>
     </v-col>
 
   </v-row>
+  <!-- Tall for the table -->
+  <p class="ml-11 mb-1 text-h6">{{ tallyStatement }} </p>
+
+  <!-- Table -->
   <v-row>
     <v-col cols="9">
       <div class="ml-7">
@@ -203,23 +217,26 @@
       <v-card class="mr-5 bg-grey-lighten-3 border-e-thin border-s-thin" elevation="0">
         <p class="text-center text-h5 py-3" style="background-color: #3a53a5; color: white;">Resident Info</p>
 
-        <v-card max-height="700" class="overflow-y-scroll " height="365px" v-if="selectedItem">
+        <v-card max-height="700px" class="overflow-y-scroll " height="365px" v-if="selectedItem">
           <div class="mt-4 ">
             <!-- Name -->
             <p class="font-weight-light  ml-3  text-caption">Full Name:</p>
-            <p class="font-weight-regular ml-3 mb-2 text-h6 "> {{ convertToSentenceCase(selectedItem.last_name) }} {{ convertToSentenceCase(selectedItem.first_name) }} {{ selectedItem.middle_name.charAt(0).toUpperCase() }}.</p>
-             <!-- Weight -->
-             <p class="font-weight-light  ml-3  text-caption">Weight:</p>
-             <p class="font-weight-regular ml-3 mb-2 text-h6 ">{{ selectedItem.weight }} kg</p>
-             <!-- Height -->
-             <p class="font-weight-light  ml-3  text-caption">Height:</p>
-             <p class="font-weight-regular ml-3 mb-2 text-h6 ">{{ selectedItem.height }} cm</p>
+            <p class="font-weight-regular ml-3 mb-2 text-h6 "> {{ convertToSentenceCase(selectedItem.last_name) }} {{
+        convertToSentenceCase(selectedItem.first_name) }} {{ selectedItem.middle_name.charAt(0).toUpperCase() }}.
+            </p>
+            <!-- Weight -->
+            <p class="font-weight-light  ml-3  text-caption">Weight:</p>
+            <p class="font-weight-regular ml-3 mb-2 text-h6 ">{{ selectedItem.weight }} kg</p>
+            <!-- Height -->
+            <p class="font-weight-light  ml-3  text-caption">Height:</p>
+            <p class="font-weight-regular ml-3 mb-2 text-h6 ">{{ selectedItem.height }} cm</p>
             <!-- Household SIze -->
             <p class="font-weight-light  ml-3  text-caption">Household Size:</p>
             <p class="font-weight-regular ml-3 mb-2 text-h6 "> 10</p>
             <!-- Relation with Family Head-->
             <p class="font-weight-light  ml-3  text-caption">Relationship to Head of The Family:</p>
-            <p class="font-weight-regular ml-3 mb-2 text-h6 "> {{convertToSentenceCase(selectedItem.relation_to_family_head) }}</p>
+            <p class="font-weight-regular ml-3 mb-2 text-h6 ">
+              {{ convertToSentenceCase(selectedItem.relation_to_family_head) }}</p>
             <!-- Peersonal Income -->
             <p class="font-weight-light ml-3 text-caption">Personal Income:</p>
             <p class="font-weight-regular ml-3 mb-2 text-h6">{{ selectedItem.personal_income }}</p>
@@ -297,7 +314,10 @@ export default {
       deleteDialog: false,
       successDialog: false,
       search: '',
-      CategoryName: '',
+
+      tallyStatement: '',
+
+      CategoryName: 'All',
       Group: '',
       selectedItem: null,
       residents: [],
@@ -320,12 +340,13 @@ export default {
         hhHead: '',
         hhSize: '',
         relToHead: '',
+
       },
 
       rules: {
         required: value => !!value || 'Required.',
-        minLength: value => (value || '').length >= 2 || `Min 2 characters.`,
-        maxLength: value => (value || '').length <= 10 || `Max 10 characters.`,
+        minLength: length => value => value.length >= length || `Min ${length} characters.`,
+        maxLength: length => value => value.length <= length || `Max ${length} characters.`,
         email: value => {
           const pattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
           return pattern.test(value) || 'Invalid e-mail.';
@@ -342,7 +363,7 @@ export default {
           const birthDate = new Date(value);
           return birthDate <= today || 'Birth date must be in the past.';
         },
-        lettersOnly: value => /^[a-zA-Z]*$/.test(value) || 'Only letters allowed.',
+        lettersOnly: value => /^[a-zA-Z\s-]*$/.test(value) || 'Only letters and spaces allowed.',
       },
 
     };
@@ -350,6 +371,9 @@ export default {
   methods: {
     onRowClick(item) {
       this.selectedItem = item;
+    },
+    updateTallyStatement() {
+      this.tallyStatement = this.tallyStatementMethod;
     },
     convertToSentenceCase(name) {
       if (!name) return ''; // If name is undefined or null, return an empty string
@@ -394,6 +418,13 @@ export default {
       return null;
     },
     submitClicked() {
+
+      const isValid = this.validateForm();
+
+      if (!isValid) {
+        // If validation fails, return early and do not proceed
+        return;
+      }
 
       const newResident = {
         resident_id: this.residents.length + 1,
@@ -444,6 +475,36 @@ export default {
         this.residentDialog = false;
       }, 1000);
     },
+    validateForm() {
+      const rules = this.rules;
+      const resident = this.resident;
+      const fieldsToValidate = {
+        firstName: [rules.required, rules.minLength(2), rules.lettersOnly],
+        middleName:[rules.minlength(2), rules.lettersOnly],
+        lastName: [rules.required, rules.minLength(2), rules.lettersOnly],
+        email: [rules.required, rules.email],
+        contactNum: [rules.required, rules.phoneNumber, rules.maxLength(10)],
+        birthDate: [rules.required, rules.birthDate],
+        gender: [rules.required],
+        nationality: [rules.required, rules.lettersOnly],
+        civStat: [rules.required],
+        zone: [rules.required],
+        age: [rules.numeric, rules.positive, rules.ageRange],
+      };
+
+      for (const [field, validations] of Object.entries(fieldsToValidate)) {
+        for (const validation of validations) {
+          const result = validation(resident[field]);
+          if (result !== true) {
+            alert(`${field}: ${result}`);
+            console.log(`Validation failed: ${field}: ${result}`);  // Debugging log
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+
     editInfo(item) {
       this.residentDialog = true;
 
@@ -617,8 +678,8 @@ export default {
           case 'Civil Status':
             filteredItems = filteredItems.filter(
               (item) =>
-                item.civilStatus &&
-                item.civilStatus.toLowerCase() === this.Group.toLowerCase()
+                item.civil_status &&
+                item.civil_status.toLowerCase() === this.Group.toLowerCase()
             );
             break;
         }
@@ -628,7 +689,7 @@ export default {
       if (this.search) {
         filteredItems = filteredItems.filter((item) =>
           Object.values(item).some((value) =>
-            value.toString().toLowerCase().startsWith(this.search.toLowerCase())
+            value.toString().toLowerCase().includes(this.search.toLowerCase())
           )
         );
       }
@@ -640,7 +701,15 @@ export default {
         case 'All':
           return [];
         case 'Age':
-          return ['Infant [0 - 1]', 'Toddler [2 - 4]', 'Child [5 - 12]', 'Adolescent [13 - 19]', 'Young Adult [20 - 34]', 'Middle-Aged [35 - 54]', 'Older Adult [55 - 64]', 'Senior [65 Above]',
+          return [
+            'Infant [0 - 1]',
+            'Toddler [2 - 4]',
+            'Child [5 - 12]',
+            'Adolescent [13 - 19]',
+            'Young Adult [20 - 34]',
+            'Middle-Aged [35 - 54]',
+            'Older Adult [55 - 64]',
+            'Senior [65 Above]'
           ];
         case 'Gender':
           return ['Female', 'Male'];
@@ -652,10 +721,78 @@ export default {
           return [];
       }
     },
+    tallyStatementMethod() {
+      let filteredItems = this.filteredItems;
 
+      if (!this.CategoryName || this.CategoryName === 'All') {
+        return `Total Residents: ${filteredItems.length}`;
+      }
+
+      switch (this.CategoryName) {
+        case 'Age':
+          switch (this.Group) {
+            case 'Infant [0 - 1]':
+              return `Total of Residents Age 0 - 1: ${filteredItems.length}`;
+            case 'Toddler [2 - 4]':
+              return `Total of Residents Age 2 - 4: ${filteredItems.length}`;
+            case 'Child [5 - 12]':
+              return `Total of Residents Age 5 - 12: ${filteredItems.length}`;
+            case 'Adolescent [13 - 19]':
+              return `Total of Residents Age 13 - 19: ${filteredItems.length}`;
+            case 'Young Adult [20 - 34]':
+              return `Total of Residents Age 20 - 34: ${filteredItems.length}`;
+            case 'Middle-Aged [35 - 54]':
+              return `Total of Residents Age 35 - 54: ${filteredItems.length}`;
+            case 'Older Adult [55 - 64]':
+              return `Total of Residents Age 55 - 64: ${filteredItems.length}`;
+            case 'Senior [65 Above]':
+              return `Total of Residents Age 65 and Above: ${filteredItems.length}`;
+          }
+          break;
+        case 'Gender':
+          switch (this.Group) {
+            case 'Female':
+              return `Total of Female Residents: ${filteredItems.length}`;
+            case 'Male':
+              return `Total of Male Residents: ${filteredItems.length}`;
+          }
+          break;
+        case 'Zone':
+          return `Total of Residents in Zone ${this.Group}: ${filteredItems.length}`;
+        case 'Civil Status':
+          switch (this.Group) {
+            case 'Single':
+              return `Total of Single Residents: ${filteredItems.length}`;
+            case 'Married':
+              return `Total of Married Residents: ${filteredItems.length}`;
+            case 'Annulled':
+              return `Total of Annulled Residents: ${filteredItems.length}`;
+            case 'Widowed':
+              return `Total of Widowed Residents: ${filteredItems.length}`;
+            case 'Live-in':
+              return `Total of Live-in Residents: ${filteredItems.length}`;
+          }
+          break;
+
+      }
+      return '';
+    },
+  },
+  watch: {
+    CategoryName() {
+      this.Group = '';
+      this.updateTallyStatement();
+    },
+    Group() {
+      this.updateTallyStatement();
+    },
+    search() {
+      this.updateTallyStatement();
+    },
   },
   mounted() {
     this.fetchData();
+    this.updateTallyStatement();
   }
 };
 </script>
