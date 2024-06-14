@@ -7,7 +7,7 @@
             <v-text-field v-else hide-details density="compact" label="Payment Status"
                 v-model="selectedRow.payment_status" variant="solo" single-line readonly
                 bg-color="green"></v-text-field>
-            <v-text-field hide-details density="compact" label="Document ID" v-model="selectedRow.document_id"
+            <v-text-field hide-details density="compact" label="Document ID" v-model="selectedRow.certification_id"
                 variant="outlined" readonly></v-text-field>
             <v-text-field hide-details density="compact" label="Name" v-model="fullName" variant="outlined"
                 readonly></v-text-field>
