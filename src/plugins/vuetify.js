@@ -22,7 +22,7 @@ export default createVuetify({
             dark: false,
             colors: {
               primary: colors.indigo.darken1,
-              primary_light: colors.indigo.lighten3,
+              primary_light: colors.indigo.lighten1,
               secondary: colors.red.darken1,
               teriary: colors.green.darken1,
               disable: colors.grey.lighten3,

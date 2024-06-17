@@ -16,14 +16,13 @@
 export default {
   data() {
     return {
-      access: false,
       user: {
-        admin_id: '',
-        postion_id: '',
-        description: '',
-        first_name: '',
-        middle_name: '',
-        last_name: '',
+        admin_id: '3',
+        position_id: '3',
+        description: 'Secretary',
+        first_name: 'Mark Anthony',
+        middle_name: 'Amican',
+        last_name: 'Rodriguez',
         suffix: '',
       },
     }

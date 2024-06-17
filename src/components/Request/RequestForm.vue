@@ -1,75 +1,41 @@
 <template>
     <v-dialog max-width="600" persistent>
         <template v-slot:activator="{ props: activatorProps }">
-            <v-btn :disabled="user.position_id != 3" width="100%" :prepend-icon="icon" variant="flat" v-bind="activatorProps" color="surface-variant"
+            <v-btn :disabled="user.position_id != 3" height="100%" width="100%" :prepend-icon="icon" variant="flat" v-bind="activatorProps" color="primary"
                 :text="titleBox"></v-btn>
         </template>
 
         <template v-slot:default="{ isActive }">
             <v-card class="pa-5" :prepend-icon="icon" :title="titleBox">
                 <v-form @submit.prevent class="ma-7 d-flex flex-column ga-2">
-                    <div v-if="!payment">
+                    <div v-if="!payment" class="d-flex flex-column ga-2">
                         <v-row>
-                            <v-combobox v-model="doc.resident_id" label="Resident Name *"
-                                :rules="[v => !!v || 'Required', v => names.includes(v) || 'Not Resident']"
-                                :items="names" item-title="name" item-value="id" variant="outlined"></v-combobox>
+                            <v-combobox class="input" v-model="doc.resident_id" label="Resident Name *"
+                                :rules="[v => !!v || 'Required', v => residents.includes(v) || 'Not Resident']"
+                                :items="residents" item-title="name" variant="solo-filled" ></v-combobox>
                         </v-row>
                         <v-row>
-                            <v-text-field v-model="doc.email" clearable label="Email *" :rules="[v => !!v || 'Required', v => /^[a-z0-9.-]+@[a-z.-]+\.[a-z]+$/i.test(v)
+                            <v-text-field :disabled="!residents.includes(doc.resident_id)" v-model="doc.email" clearable label="Email *" :rules="[v => !v || /^[a-z0-9.-]+@[a-z.-]+\.[a-z]+$/i.test(v)
                                 || 'Invalid Email']" variant="outlined"></v-text-field>
                         </v-row>
                         <v-row>
-                            <v-text-field v-model="doc.phone_num" clearable label="Phone Number *"
-                                :rules="[v => !!v || 'Required', v => v.length == 11 && /[0-9-]+/.test(v) || 'Invalid Phone Number']"
+                            <v-text-field :disabled="!residents.includes(doc.resident_id)" v-model="doc.phone_num" clearable label="Phone Number *"
+                                :rules="[v => !v || (/^09\d{9}$/.test(v) || /^\+639\d{9}$/.test(v)) || 'Invalid Phone Number']"
                                 variant="outlined"></v-text-field>
                         </v-row>
                         <v-row>
-                            <v-combobox v-model="doc.document_type" label="Document Type *" :items="documents"
+                            <v-combobox :disabled="!residents.includes(doc.resident_id)" v-model="doc.document_type" label="Document Type *" :items="documents"
                                 item-title="description" item-value="document_id"
                                 :rules="[v => !!v || 'Required', v => documents.includes(v) || 'Not a Document']"
                                 variant="outlined"></v-combobox>
                         </v-row>
                         <v-row>
-                            <v-text-field v-model="doc.purpose" clearable label="Purpose*"
+                            <v-text-field :disabled="!residents.includes(doc.resident_id)" v-model="doc.purpose" clearable label="Purpose *"
                                 :rules="[v => !!v || 'Required']" variant="outlined"></v-text-field>
                         </v-row>
                     </div>
-                    <div v-else>
-                        <v-row>
-                            <div class="w-100 pb-5">
-                                <v-btn append-icon="mdi-chevron-right" :color="isRegistered.color"
-                                    :text="isRegistered.text" variant="tonal" block></v-btn>
-                            </div>
-                        </v-row>
-                        <v-row>
-                            <v-text-field v-model="doc.document_cost" clearable prefix="₱" label="Document Cost *"
-                                type="Number" :rules="[v => !!v || 'Required', v => /^\d+$/i.test(v) || 'No letters']"
-                                variant="outlined"></v-text-field>
-                        </v-row>
-                        <v-row>
-                            <v-text-field v-model="doc.stamp_fee" clearable prefix="₱" label="Stamp Fee *" type="Number"
-                                :rules="[v => !!v || 'Required', v => /^\d+$/i.test(v) || 'No letters']"
-                                variant="outlined"></v-text-field>
-                        </v-row>
-                        <v-row>
-                            <v-text-field v-model="totalAmount" clearable prefix="₱" label="Total Cost *" type="Number"
-                                :rules="[v => !!v || 'Required', v => /^\d+$/i.test(v) || 'No letters']"
-                                variant="outlined"></v-text-field>
-                        </v-row>
-                        <v-row>
-                            <v-text-field v-model="doc.fee" clearable prefix="₱" label="Fee *" type="Number"
-                                :rules="[v => !!v || 'Required', v => /^\d+$/i.test(v) || 'No letters']"
-                                variant="outlined"></v-text-field>
-                        </v-row>
-                    </div>
                     <v-row class="d-flex justify-end ma-0 pa-0 ga-2">
-                        <v-col v-if="payment">
-                            <h3>Change: ₱ {{ totalChange }}</h3>
-                        </v-col>
-
-                        <v-btn v-if="payment" size="large" text="Back" @click="payment = false"
-                            prepend-icon="mdi-arrow-left" flat></v-btn>
-                        <v-btn v-else size="large" text="Cancel" @click="cancel(isActive)" prepend-icon="mdi-close"
+                        <v-btn size="large" text="Cancel" @click="cancel(isActive)" prepend-icon="mdi-close"
                             flat></v-btn>
                         <v-dialog v-model="discardOverlay" persistent max-width="500px" transition="dialog-transition">
                             <v-card>
@@ -85,16 +51,20 @@
                                 </v-alert>
                             </v-card>
                         </v-dialog>
-                        <v-btn v-if="payment || selectedRow" color="primary" size="large" text="Submit" type="submit"
+                        <v-btn :disabled="!residents.includes(doc.resident_id)" color="primary" size="large" text="Submit" type="submit"
                             prepend-icon="mdi-content-save-check" variant="flat" @click="submit()"></v-btn>
-                        <v-btn v-else :disabled="!doc.resident_id.id > 0" size="large" text="Next" type="submit"
-                            prepend-icon="mdi-arrow-right" variant="flat" @click="payment = true, cedulaValidate()"></v-btn>
                     </v-row>
                 </v-form>
             </v-card>
         </template>
     </v-dialog>
 </template>
+<style scoped>
+
+.input .v-messages__message {
+  text-align: right;
+}
+</style>
 <script>
 import axios from 'axios';
 
@@ -127,7 +97,10 @@ export default {
         discardOverlay: false,
         doc: {
             certification_id: '',
-            resident_id: '',
+            resident_id: {
+                name: '',
+                id: '',
+            },
             email: '',
             phone_num: '',
             document_type: '',
@@ -137,34 +110,35 @@ export default {
             total: '',
             fee: '',
         },
-        names: [],
+        residents: [],
         documents: [],
     }),
     methods: {
         submit() {
-            axios.post('http://localhost/bms/src/php/Request/insert.php', {
-                action: 'insert',
-                certification: this.doc.certification_id,
-                resident_id: this.doc.resident_id.id,
-                email: this.doc.email,
-                phone_num: this.doc.phone_num,
-                document_type: this.doc.document_type.document_id,
-                purpose: this.doc.purpose,
-            }).then(response => {
-                console.log(response.data);
-            });
+            console.log(this.doc.resident_id);
+            // axios.post('http://localhost/bms/src/php/Request/insert.php', {
+            //     action: 'insert',
+            //     certification: this.doc.certification_id,
+            //     resident_id: this.doc.resident_id.id,
+            //     email: this.doc.email,
+            //     phone_num: this.doc.phone_num,
+            //     document_type: this.doc.document_type.document_id,
+            //     purpose: this.doc.purpose,
+            // }).then(response => {
+            //     console.log(response.data);
+            // });
 
-            axios.post('http://localhost/bms/src/php/Request/insert.php', {
-                action: 'insertPayment',
-                certification: this.doc.certification_id,
-                document_cost: this.doc.document_cost,
-                stamp_fee: this.doc.stamp_fee,
-                fee: this.doc.fee,
-            }).then(response => {
-                console.log(response.data);
-            });
+            // axios.post('http://localhost/bms/src/php/Request/insert.php', {
+            //     action: 'insertPayment',
+            //     certification: this.doc.certification_id,
+            //     document_cost: this.doc.document_cost,
+            //     stamp_fee: this.doc.stamp_fee,
+            //     fee: this.doc.fee,
+            // }).then(response => {
+            //     console.log(response.data);
+            // });
 
-            this.getReq();
+            // this.getReq();
         },
         setForm() {
             if (this.selectedRow) {
@@ -210,7 +184,7 @@ export default {
             axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'getAll',
             }).then(response => {
-                this.names = response.data;
+                this.residents = response.data;
             })
         },
         getDocuments() {
