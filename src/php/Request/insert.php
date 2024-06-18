@@ -16,9 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
         header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
     exit(0);
 }
-$req = json_decode(file_get_contents("php://input"));
-if ($req) {
-
     if ($req->action == 'insert') {
         $stmt = $conn->prepare("INSERT INTO certification (certification_id, resident_id, phone_num, email, document_id, purpose, release_date) VALUES (?, ?, ?, ?, ?, ?, ?);");
         $stmt->bind_param("sssssss", $req->certification, $req->resident_id, $req->phone_num, $req->email, $req->document_type, $req->purpose, $req->release_date);

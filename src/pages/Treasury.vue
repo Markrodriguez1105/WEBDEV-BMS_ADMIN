@@ -57,7 +57,7 @@
                 <td>{{ item.birthdate }}</td>
                 <td>{{ item.paymentStatus }}</td>
                 <td>
-
+                
                 </td>
               </tr>
             </tbody>
@@ -152,10 +152,8 @@
               </v-row>
             </div>
           </div>
-
         </v-card>
       </v-col>
-
     </v-row>
 
     <!-- Cedula Form -->
@@ -305,7 +303,6 @@
             Cancel
           </v-btn>
         </v-card-actions>
-
 
         <!-- Form Inputs -->
 

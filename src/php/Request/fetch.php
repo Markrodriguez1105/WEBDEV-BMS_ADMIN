@@ -107,4 +107,3 @@ if ($req) {
             break;
     }
 }
-$conn->close();

@@ -14,7 +14,7 @@ import Resident from "../pages/Resident.vue"
 import Report from "../pages/Report.vue";
 import Request from "../pages/Request.vue";
 import Treasury from "../pages/Treasury.vue";
-import Landing from "../components/Landing.vue";
+
 
 
 
@@ -64,11 +64,6 @@ const router = createRouter({
       name: 'Treasury',
       component: Treasury,
     },
-    {
-      path: '/Landing',
-      name: 'Landing',
-      component: Landing,
-    }
   ]
 });
 

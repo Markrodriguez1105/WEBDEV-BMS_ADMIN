@@ -333,5 +333,4 @@ export default {
         // this.filteredDocuments();
     }
 }
-
 </script>

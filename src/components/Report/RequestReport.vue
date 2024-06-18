@@ -98,6 +98,7 @@
               <div>
                 <p v-if="selectedItem">
                   Respondent:<br> <strong>{{ selectedItem.fullName }}</strong> <br />
+                  
                   {{ selectedItem.date_recorded }}
                 </p>
               </div>
@@ -117,6 +118,7 @@
               <strong>Report Type:</strong><br /> {{ selectedItem.report_type }}<br />
               <strong>Report Status:</strong><br /> {{ selectedItem.status }}<br />
               <strong>Complaint:</strong><br /> {{ selectedItem.reason }}<br />
+              
               <hr />
               <v-btn class="btn-schedule" color="primary" @click="openHearingScheduleDialog">Hearing Schedule</v-btn>
               <v-btn class="btn-print" color="secondary" @click="printItem(selectedItem)">
@@ -167,7 +169,6 @@
             </v-card>
           </v-dialog>
         </template>
-
         <v-dialog v-model="dialog" max-width="1000px">
           <v-card>
             <v-card-title>
@@ -421,13 +422,10 @@ export default {
       }));
     }
   },
-
-
   created() {
     this.fetchReports();
     this.fetchReportTypes();
   },
-
 
   methods: {
     // Fetching data from backend
@@ -681,9 +679,6 @@ export default {
   },
 };
 </script>
-
-
-
 <style scoped>
 .main-content {
   margin-top: 1em;
@@ -706,11 +701,9 @@ export default {
   border: 1px solid #ddd;
   margin-bottom: 1em;
 }
-
 .reportSearch {
   max-width: 20em;
 }
-
 .v-card {
   cursor: pointer;
   margin-bottom: 16px;
