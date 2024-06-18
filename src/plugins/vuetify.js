@@ -11,6 +11,7 @@ import 'vuetify/styles'
 // Composables
 import { createVuetify } from 'vuetify'
 import colors from 'vuetify/util/colors'
+import { VCalendar } from 'vuetify/labs/VCalendar'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
@@ -20,10 +21,16 @@ export default createVuetify({
           light: {
             dark: false,
             colors: {
-              primary: colors.blue.lighten4,
-              secondary: colors.red.lighten4,
+              primary: colors.indigo.darken1,
+              primary_light: colors.indigo.lighten1,
+              secondary: colors.red.darken1,
+              teriary: colors.green.darken1,
+              disable: colors.grey.lighten3,
             }
           },
         },
+      },
+      components: {
+        VCalendar,
       },
 })

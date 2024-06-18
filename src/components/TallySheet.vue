@@ -408,7 +408,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .v-table .v-table__wrapper>table>thead>tr>th {
   border-bottom: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
   background-color: #3a53a5;

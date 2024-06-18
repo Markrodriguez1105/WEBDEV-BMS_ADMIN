@@ -16,6 +16,9 @@ import Request from "../pages/Request.vue";
 import Treasury from "../pages/Treasury.vue";
 
 
+
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -34,6 +37,8 @@ const router = createRouter({
       name: 'Household Record',
       component: Household,
     },
+    
+   
     {
       path: '/Resident',
       name: 'Resident Record',

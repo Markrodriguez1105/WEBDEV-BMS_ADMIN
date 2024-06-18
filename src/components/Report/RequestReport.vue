@@ -2,38 +2,54 @@
   <v-row>
     <v-col col="9" class="main-content">
       <v-toolbar flat>
+        <!-- New Report button with plus icon -->
         <v-btn class="p-5" value="elevates" dark @click="openDialog('New Item')">
-          New Report
+          <v-icon left>mdi-plus </v-icon>
+          Report
         </v-btn>
+        <!-- Icon button for Archived Reports with a tooltip -->
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on" dark @click="openArchiveDialog">
+              <v-icon>mdi-archive</v-icon>
+            </v-btn>
+          </template>
+          <span>Archived Reports</span>
+        </v-tooltip>
         <v-spacer></v-spacer>
-        <!-- Dropdown menu for filtering by type -->
-        <v-menu offset-y>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" v-on="on" icon>
-              <v-icon>mdi-filter</v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item v-for="(type, index) in report_types" :key="index" @click="filterByType(type)">
-              <v-list-item-title>{{ type }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-        <!-- Dropdown menu for filtering by status -->
-        <v-menu offset-y>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn v-bind="attrs" v-on="on" icon>
-              <v-icon>mdi-filter</v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item v-for="(status, index) in reportStatuses" :key="index" @click="filterByStatus(status)">
-              <v-list-item-title>{{ status }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+        <v-menu v-model="filterMenu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition"
+  offset-y min-width="290px">
+  <template v-slot:activator="{ on }">
+    <v-btn dark icon v-on="on">
+      <v-icon>mdi-filter</v-icon>
+    </v-btn>
+  </template>
+  <v-list>
+    <!-- Section for report types -->
+    <v-subheader>Report Types</v-subheader>
+    <v-list-item v-for="(item, index) in reportTypes" :key="'type-' + index" @click="toggleType(item)">
+      <v-list-item-title>{{ item }}</v-list-item-title>
+      <v-list-item-action>
+        <v-icon v-if="isSelectedType(item)">mdi-check</v-icon>
+      </v-list-item-action>
+    </v-list-item>
+
+    <!-- Divider between sections -->
+    <v-divider></v-divider>
+
+    <!-- Section for report statuses -->
+    <v-subheader>Report Statuses</v-subheader>
+    <v-list-item v-for="(item, index) in reportStatuses" :key="'status-' + index" @click="toggleStatus(item)">
+      <v-list-item-title>{{ item }}</v-list-item-title>
+      <v-list-item-action>
+        <v-icon v-if="isSelectedStatus(item)">mdi-check</v-icon>
+      </v-list-item-action>
+    </v-list-item>
+  </v-list>
+</v-menu>
         <!-- Text field for search -->
-        <v-text-field max-width="20%" v-model="search" label="Search" single-line hide-details outlined></v-text-field>
+        <v-text-field class="reportSearch" v-model="search" label="Search" single-line hide-details
+          outlined></v-text-field>
       </v-toolbar>
       <v-container class="scrollable-container">
         <v-row>
@@ -81,7 +97,8 @@
             <v-col cols="8">
               <div>
                 <p v-if="selectedItem">
-                  Full Name:<br> <strong>{{ selectedItem.fullName }}</strong> <br />
+                  Respondent:<br> <strong>{{ selectedItem.fullName }}</strong> <br />
+                  
                   {{ selectedItem.date_recorded }}
                 </p>
               </div>
@@ -89,18 +106,19 @@
           </v-row>
         </v-container>
         <v-container class="display-container">
-          <h2>Report Info</h2>
+          <h2>Complaint Info</h2>
           <hr>
           <div>
             <p v-if="selectedItem">
-              <strong>Full Name:</strong><br /> {{ selectedItem.fullName }}<br />
+              <strong>Complainant:</strong><br /> {{ selectedItem.fullName }}<br />
               <strong>Phone:</strong><br /> {{ selectedItem.phone_num }}<br />
               <strong>Email:</strong><br /> {{ selectedItem.email }}<br />
-              <strong>Zone-Address:</strong><br /> {{ selectedItem.zone_address }}<br />
+              <strong>Zone-Address:</strong><br /> {{ selectedItem.zone }}<br />
               <strong>Date Recorded:</strong><br /> {{ selectedItem.date_recorded }}<br />
               <strong>Report Type:</strong><br /> {{ selectedItem.report_type }}<br />
               <strong>Report Status:</strong><br /> {{ selectedItem.status }}<br />
-              <strong>Purpose:</strong><br /> {{ selectedItem.reason }}<br />
+              <strong>Complaint:</strong><br /> {{ selectedItem.reason }}<br />
+              
               <hr />
               <v-btn class="btn-schedule" color="primary" @click="openHearingScheduleDialog">Hearing Schedule</v-btn>
               <v-btn class="btn-print" color="secondary" @click="printItem(selectedItem)">
@@ -151,11 +169,7 @@
             </v-card>
           </v-dialog>
         </template>
-
-
-
-
-        <v-dialog v-model="dialog" max-width="800px">
+        <v-dialog v-model="dialog" max-width="1000px">
           <v-card>
             <v-card-title>
               <v-row justify="space-between">
@@ -175,36 +189,91 @@
             <v-card-text>
               <v-form ref="form" v-model="valid" lazy-validation>
                 <v-container>
+                  <!-- Complainant Section -->
                   <v-row>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.first_name" :rules="[v => !!v || 'First Name is required']"
-                        label="First Name" variant="outlined"></v-text-field>
+                    <v-col cols="12">
+                      <h3>Complainant Details</h3>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.middle_name" label="Middle Name"
-                        variant="outlined"></v-text-field>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-autocomplete v-model="complainant" :items="residents" item-text="fullName" item-value="id"
+                        label="Search Resident" variant="outlined" @change="fillComplainantFields">
+                      </v-autocomplete>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.last_name" :rules="[v => !!v || 'Last Name is required']"
-                        label="Last Name" variant="outlined"></v-text-field>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="editedItem.first_name" label="First Name" variant="outlined"
+                        readonly></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.suffix" label="Suffix" variant="outlined"></v-text-field>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="editedItem.middle_name" label="Middle Name" variant="outlined"
+                        readonly></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.phone_num" :rules="[v => !!v || 'Phone number is required']"
-                        label="Phone" variant="outlined"></v-text-field>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="editedItem.last_name" label="Last Name" variant="outlined"
+                        readonly></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-text-field v-model="editedItem.email" :rules="[v => !!v || 'Email is required']" label="Email"
-                        variant="outlined"></v-text-field>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="editedItem.suffix" label="Suffix" variant="outlined"
+                        readonly></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
-                      <v-select v-model="editedItem.zone_address" :items="zones"
-                        :rules="[v => !!v || 'Zone Address is required']" label="Zone Address"
-                        variant="outlined"></v-select>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="editedItem.phone_num" label="Phone" variant="outlined"
+                        readonly></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="editedItem.email" label="Email" variant="outlined" readonly></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-select v-model="editedItem.zone" :items="zones" label="Zone Address" variant="outlined"
+                        readonly></v-select>
+                    </v-col>
+                  </v-row>
+
+                  <!-- Respondent Section -->
+                  <v-row>
+                    <v-col cols="12">
+                      <h3>Respondent Details</h3>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-autocomplete v-model="respondent" :items="residents" item-text="fullName" item-value="id"
+                        label="Search Resident" variant="outlined" @change="fillRespondentFields">
+                      </v-autocomplete>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="respondentItem.first_name" label="First Name" variant="outlined"
+                        readonly></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="respondentItem.middle_name" label="Middle Name" variant="outlined"
+                        readonly></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="respondentItem.last_name" label="Last Name" variant="outlined"
+                        readonly></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="respondentItem.suffix" label="Suffix" variant="outlined"
+                        readonly></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="respondentItem.phone_num" label="Phone" variant="outlined"
+                        readonly></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-text-field v-model="respondentItem.email" label="Email" variant="outlined"
+                        readonly></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-select v-model="respondentItem.zone" :items="zones" label="Zone Address" variant="outlined"
+                        readonly></v-select>
+                    </v-col>
+                  </v-row>
+
+                  <!-- Other Details Section -->
+                  <v-row>
+                    <v-col cols="12">
+                      <h3>Other Details</h3>
+                    </v-col>
+                    <v-col cols="12" md="3" sm="6">
                       <v-menu v-model="menu" :close-on-content-click="false" transition="scale-transition" offset-y>
                         <template v-slot:activator="{ on }">
                           <v-text-field v-model="editedItem.dateRecorded" label="Date Recorded" v-on="on" type="date"
@@ -214,23 +283,12 @@
                           required></v-date-picker>
                       </v-menu>
                     </v-col>
-
-                    <v-col cols="12" md="4" sm="6">
-                      <v-autocomplete v-model="editedItem.report_type" :items="reportTypes"
-                        :rules="[v => !!v || 'Report Type is required']" label="Report Type" variant="outlined"
-                        @blur="handleBlur('reportType', editedItem.report_type)" clearable>
-                      </v-autocomplete>
+                    <v-col cols="12" md="3" sm="6">
+                      <v-autocomplete v-model="editedItem.report_type" :items="reportTypes" label="Report Type"
+                        variant="outlined" required></v-autocomplete>
                     </v-col>
-
-                    <v-col cols="12" md="4" sm="6" v-if="formTitle === 'Edit Item'">
-                      <!-- Only show the report_status field in the edit form -->
-                      <v-autocomplete v-model="editedItem.status" :items="reportStatuses" label="Report Status"
-                        variant="outlined">
-                      </v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" md="12">
-                      <v-textarea v-model="editedItem.reason" :rules="[v => !!v || 'Purpose is required']"
-                        label="Purpose" variant="outlined"></v-textarea>
+                    <v-col cols="12" md="6" sm="12">
+                      <v-textarea v-model="editedItem.reason" label="Complain" variant="outlined" required></v-textarea>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -254,11 +312,14 @@ import { useDate } from 'vuetify';
 export default {
   data() {
     return {
+      filterMenu: false,
+      statusMenu: false,
       reports: [],
-      reportTypes: [],
-      search: '',
-      selectedStatus: [],
+      reportTypes: ['Type1', 'Type2', 'Type3','Type4','Type5'], // Example report types
       selectedType: [],
+      reportStatuses: ['Pending', 'Solved', 'InProgress','1st Hearing','2nd Hearing','3rd Hearing',], // Example statuses
+      selectedStatus: [],
+      search: '',   
       selectedItem: null,
       editedItem: {
         report_id: null,
@@ -271,11 +332,25 @@ export default {
         date_recorded: '',
         email: '',
         phone_num: '',
-        zone_address: '',
+        zone: '',
         reason: '',
         status: 'pending',
         report_status: '',
         InOutBarangay: ''
+      },
+      respondentItem: {
+        blotter_id: null,
+        hearing_id: null,
+        resident_id: null,
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        suffix: '',
+        zone: '',
+        summon_date: '',
+        blotter_status: '',
+        blotter_remarks: '',
+        archive_blotter: ''
       },
       editedIndex: -1,
       dialog: false,
@@ -305,10 +380,24 @@ export default {
         date_recorded: '',
         email: '',
         phone_num: '',
-        zone_address: '',
+        zone: '',
         reason: '',
         report_status: '',
         InOutBarangay: ''
+      },
+      defaultRespondentItem: {
+        blotter_id: null,
+        hearing_id: null,
+        resident_id: null,
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        suffix: '',
+        zone: '',
+        summon_date: '',
+        blotter_status: '',
+        blotter_remarks: '',
+        archive_blotter: ''
       },
       valid: false
     };
@@ -337,7 +426,9 @@ export default {
     this.fetchReports();
     this.fetchReportTypes();
   },
+
   methods: {
+    // Fetching data from backend
     fetchReports() {
       axios.get('http://localhost/ReportBackend/data.php')
         .then(response => {
@@ -356,26 +447,29 @@ export default {
           console.error("There was an error fetching the report types!", error);
         });
     },
-    filterByType(type) {
-      if (!this.selectedType.includes(type)) {
-        this.selectedType.push(type);
+    toggleType(item) {
+      const index = this.selectedTypes.indexOf(item);
+      if (index > -1) {
+        this.selectedTypes.splice(index, 1);
       } else {
-        this.selectedType = this.selectedType.filter(item => item !== type);
+        this.selectedTypes.push(item);
       }
-      this.applyFilters();
     },
-    filterByStatus(status) {
-      if (!this.selectedStatus.includes(status)) {
-        this.selectedStatus.push(status);
+    toggleStatus(item) {
+      const index = this.selectedStatuses.indexOf(item);
+      if (index > -1) {
+        this.selectedStatuses.splice(index, 1);
       } else {
-        this.selectedStatus = this.selectedStatus.filter(item => item !== status);
+        this.selectedStatuses.push(item);
       }
-      this.applyFilters();
     },
-    applyFilters() {
-      // Trigger filtering when filter selection changes
-      // No need to do anything here, computed property will handle the filtering
+    isSelectedType(item) {
+      return this.selectedTypes.includes(item);
     },
+    isSelectedStatus(item) {
+      return this.selectedStatuses.includes(item);
+    },
+    // Displaying item details
     displayItem(item) {
       console.log("Selected Item:", item);
       this.selectedItem = {
@@ -389,18 +483,18 @@ export default {
         date_recorded: item.date_recorded,
         email: item.email,
         phone_num: item.phone_num,
-        zone_address: item.zone_address,
+        zone: item.zone,
         reason: item.reason,
         status: item.status,
         report_status: item.status,
         InOutBarangay: item.InOutBarangay
       };
     },
+    // Handling hearing schedules
     openHearingScheduleDialog() {
       console.log("Hearing Schedule button clicked");
       this.hearingScheduleDialog = true;
     },
-
     closeHearingScheduleDialog() {
       this.hearingScheduleDialog = false;
     },
@@ -426,24 +520,19 @@ export default {
       // Close the dialog
       this.closeHearingScheduleDialog();
     },
-    // Method to get event color based on event type
+    // Getting event color based on event type
     getEventColor(event) {
-      // Check Lupon officer availability for the event
       const luponOfficerId = event.luponOfficerId;
       const luponOfficer = this.luponOfficers.find(officer => officer.id === luponOfficerId);
 
       if (luponOfficer) {
-        // Lupon officer available
         return 'blue';
       } else {
-        // Lupon officer not available
         return 'grey';
       }
     },
-    // Method to get event text color
     getEventTextColor() {
-      // You can implement logic to assign text color based on event type
-      return 'white'; // Sample text color
+      return 'white';
     },
     openDialog(title, item) {
       this.formTitle = title;
@@ -452,7 +541,7 @@ export default {
         this.editedItem = Object.assign({}, item);
       } else {
         this.editedItem = Object.assign({}, this.defaultItem);
-        delete this.editedItem.status; // Remove this line if you want to keep the default status
+        this.respondentItem = Object.assign({}, this.defaultRespondentItem);
       }
       this.dialog = true;
     },
@@ -460,6 +549,7 @@ export default {
       this.dialog = false;
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
+        this.respondentItem = Object.assign({}, this.defaultRespondentItem);
         this.editedIndex = -1;
       }, 300);
     },
@@ -479,7 +569,8 @@ export default {
       const action = this.editedIndex > -1 ? 'update' : 'insert';
       const data = {
         action: action,
-        report: this.editedItem
+        report: this.editedItem,
+        blotter: this.respondentItem
       };
 
       axios.post('http://localhost/ReportBackend/crud.php', data)
@@ -523,12 +614,15 @@ export default {
           <p><strong>Email:</strong> ${item.email}</p>
           <p><strong>Address:</strong> ${item.zone_address}</p>
           <p><strong>Date Recorded:</strong> ${item.date_recorded}</p>
-          <p><strong>Report Type:</strong> ${item.report_type}</p>
-          <p><strong>Report Status:</strong> ${item.status}</p>
-          <p><strong>Purpose:</strong> ${item.reason}</p>
+          <p><strong>Reason:</strong> ${item.reason}</p>
+          <p><strong>Type:</strong> ${item.report_type}</p>
+          <p><strong>Status:</strong> ${item.status}</p>
+          <p><strong>Location:</strong> ${item.location}</p>
+          <p><strong>In/Out Barangay:</strong> ${item.InOutBarangay}</p>
         </div>
       `;
-      const printWindow = window.open('', '', 'height=600,width=800');
+
+      const printWindow = window.open('', '', 'width=800,height=600');
       printWindow.document.write('<html><head><title>Print Report</title></head><body>');
       printWindow.document.write(printContent);
       printWindow.document.write('</body></html>');
@@ -537,8 +631,8 @@ export default {
     },
     getIndicatorColor(status) {
       switch (status) {
-        case 'pending':
-          return 'pending';
+        case 'Pending':
+          return 'Pending';
         case '1st Hearing':
           return 'first-hearing';
         case '2nd Hearing':
@@ -553,7 +647,7 @@ export default {
     },
     getProgress(status) {
       switch (status) {
-        case 'pending':
+        case 'Pending':
           return 0;
         case '1st Hearing':
           return 25;
@@ -569,7 +663,7 @@ export default {
     },
     getProgressColor(status) {
       switch (status) {
-        case 'pending':
+        case 'Pending':
         case '1st Hearing':
         case '2nd Hearing':
         case '3rd Hearing':
@@ -585,10 +679,7 @@ export default {
   },
 };
 </script>
-
-
-
-<style>
+<style scoped>
 .main-content {
   margin-top: 1em;
 }
@@ -610,7 +701,9 @@ export default {
   border: 1px solid #ddd;
   margin-bottom: 1em;
 }
-
+.reportSearch {
+  max-width: 20em;
+}
 .v-card {
   cursor: pointer;
   margin-bottom: 16px;
@@ -729,7 +822,7 @@ export default {
 
 }
 
-.pending {
+.Pending {
   background-color: #ff5733;
 }
 

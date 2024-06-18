@@ -16,18 +16,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
         header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
     exit(0);
 }
-$req = json_decode(file_get_contents("php://input"));
-echo json_encode($req);
-if ($req) {
-
     if ($req->action == 'insert') {
-        $stmt = $conn->prepare("INSERT INTO certification (certification_id, resident_id, phone_num, email, document_id, purpose) VALUES (?, ?, ?, ?, ?, ?);");
-        $stmt->bind_param("ssssss", $req->certification, $req->resident_id, $req->phone_num, $req->email, $req->document_type, $req->purpose);
-
-        if ($stmt->execute()) {
-            echo json_decode("Success");
+        $stmt = $conn->prepare("INSERT INTO certification (certification_id, resident_id, phone_num, email, document_id, purpose, release_date) VALUES (?, ?, ?, ?, ?, ?, ?);");
+        $stmt->bind_param("sssssss", $req->certification, $req->resident_id, $req->phone_num, $req->email, $req->document_type, $req->purpose, $req->release_date);
+        $result = $stmt->execute();
+        if ($result) {
+            echo json_encode(false);
         } else {
-            echo json_decode("Failed");
+            echo json_encode(true);
         }
         $stmt->close();
     }
@@ -43,5 +39,5 @@ if ($req) {
         $stmt->close();
     }
 
-    $conn->close();
 }
+$conn->close();

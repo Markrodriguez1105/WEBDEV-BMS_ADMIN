@@ -5,13 +5,17 @@
   </v-toolbar>
   <v-navigation-drawer app expand-on-hover rail v-model="drawer">
     <v-list>
-      <v-list-item prepend-avatar="../assets/images/logo.png" title="Barangay Bonifacio"></v-list-item>
+      <v-list-item prepend-avatar="../assets/images/logo.png" :title="user.description"></v-list-item>
     </v-list>
 
     <v-divider></v-divider>
 
-    <v-list v-for="list in lists" :key="list.text">
-      <v-list-item class="navigationsIcons" :prepend-icon="list.icon" :title="list.text" :to="list.route" min-height="50"></v-list-item>
+    <v-list>
+      <div v-for="list in lists" :key="list.text" class="my-2">
+        <v-list-item v-if="list.access.includes(parseInt(user.position_id))" class="navigationsIcons"
+          :prepend-icon="list.icon" :title="list.text" :to="list.route" min-height="50"
+          @click="getHeader(list.text), overlay = !overlay"></v-list-item>
+      </div>
     </v-list>
     
     <v-divider></v-divider>
@@ -31,21 +35,45 @@
 
 <script>
 export default {
+  emits: ['logout'],
+  props: {
+    login: {
+      type: Boolean,
+    },
+    user: {
+      type: Object,
+    }
+  },
   data() {
     return {
       drawer: true,
       rail: true,
       lists: [
-        { icon: 'mdi-view-dashboard', text: 'Dashboard', route: '/' },
-        { icon: 'mdi-home-city', text: 'Barangay Information', route: '/BarangayInfo' },
-        { icon: 'mdi-home-plus', text: 'Household Profiling', route: '/Household' },
-        { icon: 'mdi-account-plus', text: 'Resident Profiling', route: '/Resident' },
-        { icon: 'mdi-store-plus', text: 'Business Record', route: '/Business' },
-        { icon: 'mdi-file-document-plus', text: 'Requested Document', route: '/Request' },
-        { icon: 'mdi-comment-alert', text: 'Report', route: '/Report' },
-        { icon: 'mdi-credit-card-outline', text: 'Treasury', route: '/Treasury' },
+        { icon: 'mdi-view-dashboard', text: 'Dashboard', route: '/', access: [1, 2, 3, 4, 5, 6, 7, 8] },
+        { icon: 'mdi-home-city', text: 'Barangay Information', route: '/BarangayInfo', access: [1, 2, 3, 4, 5, 6, 7, 8] },
+        { icon: 'mdi-home-plus', text: 'Household Profiling', route: '/Household', access: [1, 2, 3, 4, 5, 6, 7, 8] },
+        { icon: 'mdi-account-plus', text: 'Resident Profiling', route: '/Resident', access: [1, 2, 3, 4, 5, 6, 7, 8] },
+        { icon: 'mdi-store-plus', text: 'Business Record', route: '/Business', access: [1, 2, 3, 4, 5, 6, 7] },
+        { icon: 'mdi-file-document-plus', text: 'Requested Document', route: '/Request', access: [1, 3, 4] },
+        { icon: 'mdi-comment-alert', text: 'Report', route: '/Report', access: [1, 3] },
+        { icon: 'mdi-credit-card-outline', text: 'Treasury', route: '/Treasury', access: [1, 4] },
       ]
     }
+  },
+  methods: {
+    getHeader(value) {
+      this.header = value;
+    },
+    logout() {
+      this.$emit('logout', null);
+    }
+  },
+  watch: {
+    overlay(val) {
+      val && setTimeout(() => {
+        this.overlay = false
+      }, 2000)
+    },
   },
 }
 </script>
