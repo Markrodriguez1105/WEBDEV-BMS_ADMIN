@@ -1,42 +1,30 @@
 <template>
     <v-row class="px-1 justify-space-between">
-        <v-col class="d-flex" cols="auto">
-            <v-btn flat :ripple="false" icon :loading="loaded" @click="getReq()">
+        <v-col class="d-flex">
+            <v-btn flat :ripple="false" icon @click="getReq()" size="small">
                 <v-icon>mdi-reload</v-icon>
                 <v-tooltip activator="parent" location="bottom">Reload</v-tooltip>
             </v-btn>
             <v-divider vertical class="my-2"></v-divider>
-            <v-btn v-if="selected.length > 0" icon variant="plain"
+            <v-btn v-if="selected.length > 0" icon variant="plain" size="small"
                 @click="show()"><v-icon>mdi-archive-arrow-down-outline</v-icon><v-tooltip activator="parent"
                     location="bottom">Archive</v-tooltip>
             </v-btn>
-            <v-btn v-if="selected.length > 0" icon variant="plain"
+            <v-btn v-if="selected.length > 0" icon variant="plain" size="small"
                 @click="show()"><v-icon>mdi-delete-outline</v-icon><v-tooltip activator="parent"
                     location="bottom">Delete</v-tooltip>
             </v-btn>
-            <v-btn flat icon>
-                <v-icon>mdi-filter-menu-outline</v-icon>
-                <v-menu activator="parent">
-                    <v-list>
-                        <v-list-item value="Release">
-                            <v-list-item-title>Released</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item value="Release">
-                            <v-list-item-title>Not Released</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item value="Release">
-                            <v-list-item-title>Released</v-list-item-title>
-                        </v-list-item>
-                        <v-list-item value="Release">
-                            <v-list-item-title>Released</v-list-item-title>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
+        </v-col>
+        <v-col cols="auto" class="d-flex">
+            <v-divider vertical class="my-2"></v-divider>
+            <v-btn icon variant="text" size="small"
+                @click="collapseAll()"><v-icon>mdi-unfold-less-horizontal</v-icon><v-tooltip activator="parent"
+                    location="bottom">Collapse All</v-tooltip>
             </v-btn>
         </v-col>
     </v-row>
     <v-data-table-virtual v-model="selected" show-select show-expand fixed-header :headers="headers" :items="docs"
-        height="70vh" item-value="certification_id">
+        height="70vh" item-value="certification_id" loading-text="Loading... Please wait" :loading="loaded" :expanded="expanded">
         <template v-slot:item.payment_status="{ value }">
             <v-chip :color="paymentStatus(value)">
                 {{ value }}
@@ -50,6 +38,7 @@
         <template v-slot:item.date_request="{ value }">
             <td>{{ date(value).toLocaleDateString() }}</td>
         </template>
+
         <template v-slot:expanded-row="{ columns, item }">
             <tr style="background-color: rgba(0, 0, 0, .1);">
                 <td></td>
@@ -90,7 +79,7 @@
                 </td>
                 <td>
                     <p>Remarks</p>
-                    <h4>{{ getRemarks(item.certification_id) }}</h4>
+                    <h4>{{ item.remarks }}</h4>
                 </td>
                 <td>
                     <p>Purpose</p>
@@ -100,7 +89,11 @@
             </tr>
             <tr style="background-color: rgba(0, 0, 0, .1);">
                 <td :colspan="columns.length">
-                    <div class="d-flex justify-end">
+                    <div class="d-flex justify-end" v-if="item.archive == 1">
+                        <v-btn icon variant="plain"><v-icon>mdi-file-restore-outline</v-icon>
+                            <v-tooltip activator="parent" location="bottom">Restore</v-tooltip></v-btn>
+                    </div>
+                    <div class="d-flex justify-end" v-else>
                         <v-btn v-if="item.payment_status.toLowerCase() == 'paid'" icon variant="text">
                             <v-icon color="primary">mdi-printer</v-icon>
                             <v-tooltip activator="parent" location="bottom">Print</v-tooltip>
@@ -110,8 +103,9 @@
 
                         <v-divider vertical class="my-2"></v-divider>
 
-                        <v-btn v-if="item.payment_status.toLowerCase() == 'paid'" icon
-                            variant="plain"><v-icon>mdi-file-move-outline</v-icon>
+                        <v-btn
+                            v-if="item.isReleased.toLowerCase() == 'not released' && item.payment_status.toLowerCase() == 'paid'"
+                            icon variant="plain"><v-icon>mdi-file-move-outline</v-icon>
                             <v-tooltip activator="parent" location="bottom">Release</v-tooltip></v-btn>
                         <v-btn icon variant="plain"><v-icon>mdi-pencil</v-icon><v-tooltip activator="parent"
                                 location="bottom">Edit</v-tooltip></v-btn>
@@ -124,6 +118,7 @@
             </tr>
         </template>
     </v-data-table-virtual>
+    <!-- <v-progress-linear v-else :indeterminate="loaded" color="primary"></v-progress-linear> -->
 </template>
 <script>
 import axios from 'axios';
@@ -143,12 +138,13 @@ export default {
     data() {
         return {
             selected: [],
+            expanded: [],
             headers: [
-                { title: 'Date Requested', align: 'start', key: 'date_request' },
+                { title: 'Date Requested', align: 'start', width: 200, key: 'date_request' },
                 { title: 'Name', align: 'start', width: 300, key: 'full_name' },
-                { title: 'Document Type', align: 'start', key: 'document_type' },
-                { title: 'Payment Status', align: 'start', key: 'payment_status' },
-                { title: 'Release Status', align: 'start', key: 'isReleased' },
+                { title: 'Document Type', align: 'start', width: 200, key: 'document_type' },
+                { title: 'Payment Status', align: 'start', width: 200, key: 'payment_status' },
+                { title: 'Release Status', align: 'start', width: 200, key: 'isReleased' },
             ]
         }
     },
@@ -187,29 +183,28 @@ export default {
         },
         copyToClipboard(text) {
             navigator.clipboard.writeText(text);
-            console.log(text);
         },
         show() {
             console.log(this.selected);
         },
-        getRemarks(id) {
-            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
-                id: id,
-                action: 'getRemarks',
-            }).then(response => {
-                console.log(response.data);
-                return response.data;
-            })
-        }
-    }
+        collapseAll() {
+            this.expanded = [];
+        },
+        toggleExpand(certification_id) {
+            if (this.expanded === certification_id) {
+                this.expanded = null; // Collapse if clicking on the same row
+            } else {
+                this.expanded = certification_id; // Expand the clicked row
+            }
+        },
+    },
+    watch: {
+        loaded(newVal) {
+            if (newVal) {
+                this.selected = [];
+                this.expanded = [];
+            }
+        },
+    },
 }
 </script>
-<style scoped>
-.row {
-    cursor: pointer;
-}
-
-.row:hover {
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
-}
-</style>
