@@ -1,7 +1,7 @@
 <template>
     <div class="business-title">
         <div class="title-line"></div>
-        <h1 class="title-text">Business Profiling</h1>
+        <h1 class="title-text">Business Record</h1>
         <div class="title-line"></div>
       </div>
     <BusinessForm />

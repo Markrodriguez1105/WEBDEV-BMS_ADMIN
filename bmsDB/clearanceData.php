@@ -9,23 +9,29 @@ $username = "root";
 $password = "";
 $dbname = "bms";
 
+// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT * FROM business"; // Replace with your actual table name
+// Fetch data from database
+$sql = "SELECT * FROM clearance";
 $result = $conn->query($sql);
 
-$businessRecords = [];
+$clearances = [];
 if ($result->num_rows > 0) {
+    // Fetch associative array
     while($row = $result->fetch_assoc()) {
-        $businessRecords[] = $row;
+        $clearances[] = $row;
     }
 }
 
-echo json_encode($businessRecords);
+// Output JSON response
+echo json_encode($clearances);
 
+// Close connection
 $conn->close();
 ?>

@@ -26,13 +26,11 @@ $response = array();
 if ($received_data) {
     $action = $received_data['action'];
     $business_id = $received_data['business_id'];
-    $barangay_id = $received_data['barangay_id'];
     $business_name = $received_data['business_name'];
     $business_type = $received_data['business_type'];
     $first_name = $received_data['first_name'];
     $middle_name = $received_data['middle_name'];
     $last_name = $received_data['last_name'];
-    $middle_initial = $received_data['middle_initial']; // Added middle_initial
     $owner_phone_num = $received_data['owner_phone_num'];
     $address = $received_data['address'];
     $monthly_income = $received_data['monthly_income'];
@@ -52,11 +50,11 @@ if ($received_data) {
         // Insert logging
         error_log("Inserting data into database...");
 
-        $sql = "INSERT INTO `business`(`business_id`, `barangay_id`, `business_name`, `business_type`, `first_name`, `middle_name`, `last_name`, `middle_initial`, `owner_phone_num`, `address`, `monthly_income`, `date_establishment`, `tin`, `vat_status`, `num_employees`, `date_registered`, `owner_email`, `active_status`) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO `business`(`business_id`, `business_name`, `business_type`, `first_name`, `middle_name`, `last_name`, `owner_phone_num`, `address`, `monthly_income`, `date_establishment`, `tin`, `vat_status`, `num_employees`, `date_registered`, `owner_email`, `active_status`) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("ssssssssssssssssss", $business_id, $barangay_id, $business_name, $business_type, $first_name, $middle_name, $last_name, $middle_initial, $owner_phone_num, $address, $monthly_income, $date_establishment, $tin, $vat_status, $num_employees, $date_registered, $owner_email, $active_status);
+            $stmt->bind_param("ssssssssssssssss", $business_id, $business_name, $business_type, $first_name, $middle_name, $last_name, $owner_phone_num, $address, $monthly_income, $date_establishment, $tin, $vat_status, $num_employees, $date_registered, $owner_email, $active_status);
 
             if ($stmt->execute()) {
                 $response['message'] = "New record created successfully";
@@ -71,28 +69,62 @@ if ($received_data) {
         }
     }
 
-    // Update action
-    if ($action == 'update') {
-        // Update logging
-        error_log("Updating data in database...");
+   // Update action
+if ($action == 'update') {
+    // Update logging
+    error_log("Updating data in database...");
 
-        $sql = "UPDATE `business` SET `barangay_id`=?, `business_name`=?, `business_type`=?, `first_name`=?, `middle_name`=?, `last_name`=?, `middle_initial`=?, `owner_phone_num`=?, `address`=?, `monthly_income`=?, `date_establishment`=?, `tin`=?, `vat_status`=?, `num_employees`=?, `date_registered`=?, `owner_email`=?, `active_status`=? WHERE `business_id` = ?";
+    $sql = "UPDATE `business` SET 
+                `business_name`=?, 
+                `business_type`=?, 
+                `first_name`=?, 
+                `middle_name`=?, 
+                `last_name`=?, 
+                `owner_phone_num`=?, 
+                `address`=?, 
+                `monthly_income`=?, 
+                `date_establishment`=?, 
+                `tin`=?, 
+                `vat_status`=?, 
+                `num_employees`=?, 
+                `date_registered`=?, 
+                `owner_email`=?, 
+                `active_status`=?
+            WHERE `business_id` = ?";
 
-        if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("ssssssssssssssssss", $barangay_id, $business_name, $business_type, $first_name, $middle_name, $last_name, $middle_initial, $owner_phone_num, $address, $monthly_income, $date_establishment, $tin, $vat_status, $num_employees, $date_registered, $owner_email, $active_status, $business_id);
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param("ssssssssssssssss", 
+            $business_name, 
+            $business_type, 
+            $first_name, 
+            $middle_name, 
+            $last_name, 
+            $owner_phone_num, 
+            $address, 
+            $monthly_income, 
+            $date_establishment, 
+            $tin, 
+            $vat_status, 
+            $num_employees, 
+            $date_registered, 
+            $owner_email, 
+            $active_status, 
+            $business_id);
 
-            if ($stmt->execute()) {
-                $response['message'] = "Record updated successfully";
-            } else {
-                error_log("Update Error: " . $stmt->error);
-                $response['error'] = "Error executing statement: " . $stmt->error;
-            }
-            $stmt->close();
+        if ($stmt->execute()) {
+            $response['message'] = "Record updated successfully";
         } else {
-            error_log("Update Statement Preparation Error: " . $conn->error);
-            $response['error'] = "Error preparing statement: " . $conn->error;
+            error_log("Update Error: " . $stmt->error);
+            $response['error'] = "Error executing statement: " . $stmt->error;
         }
+
+        $stmt->close(); // Close the statement
+    } else {
+        error_log("Update Statement Preparation Error: " . $conn->error);
+        $response['error'] = "Error preparing statement: " . $conn->error;
     }
+}
+
 
     // Delete action
     if ($action == 'delete') {

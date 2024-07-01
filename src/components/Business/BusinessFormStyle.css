@@ -1,10 +1,15 @@
 .search-bar {
   max-width: 400px;
+  width: 320px;
   margin-right: 50px;
   margin-bottom: 40px;
   margin-top: 40px;
-  color: white !important;
-  background-color: #3a53a5 !important;
+  margin-left: 20px;
+}
+
+.clearancebtn {
+  margin-left: 10px;
+  margin-top: 2px;
 }
 
 .add-btn {
@@ -28,6 +33,16 @@
   width: 96%;
 } 
 
+.addbtn {
+  margin-top: 10px;
+  margin-left: 50px;
+}
+.search2 {
+  width: 200px;
+  margin-right: 50px;
+  margin-left: 400px;
+}
+
 .action-icons {
   display: flex;
   justify-content: space-between;
@@ -40,19 +55,140 @@
 }
 
 .filter1 {
-  margin-left: 50px !important;
+  margin-left: 60px !important;
+  margin-right: 10px;
   font-weight: bold;
   
 }
 .filter2 {
-  margin-left: 350px !important;
+  margin-left: 200px !important;
+  margin-right: 10px;
   font-weight: bold;
 }
 
 .filterselect {
-  margin-right: 50px;
+  margin-right: 60px;
 }
 
 .names  {
   margin-left: 0px;
+}
+
+.v-divider {
+  width: 90%;
+  margin-left: 5%;
+  font-weight: bold !important;
+}
+
+.addtitles {
+  margin-left: 35%;
+  margin-bottom: 5%;
+  font-weight: bold;
+}
+
+.detail-field-title {
+  margin-left: 14%;
+}
+
+.contact {
+  margin-left: 38%;
+}
+
+.email {
+  margin-left: 19%;
+}
+
+.ownervalue1 {
+  margin-left: 35%;
+}
+
+.ownervalue2 {
+  margin-left: 40%;
+}
+
+.ownervalue3 {
+  margin-left: 30%;
+}
+
+.ownervalue4 {
+  margin-left: 45%;
+}
+
+.ownervalue5 {
+  margin-left: 5%;
+}
+
+.bustitle {
+  margin-left: 25%;
+}
+
+.busvalue {
+  margin-left: 40%;
+}
+
+.maintitle {
+  margin: 50px !important;
+  
+}
+
+.details-dialog {
+  /* Custom styles for the dialog */
+  position: center;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .details-dialog,
+  .details-dialog * {
+    visibility: visible;
+  }
+  .details-dialog {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.Logos2 {
+  width: 1px;
+  height: auto;
+}
+
+.dialogtext {
+  margin-left: 15%;
+}
+
+.ClearanceDetails1 {
+  margin-left:38%;
+  text-decoration: underline;
+}
+
+.ClearanceDetails2 {
+  margin-left: 40.5%;
+  text-decoration: underline;
+}
+.ClearanceDetails3 {
+  margin-left: 49.2%;
+  text-decoration: underline;
+}
+.ClearanceDetails4 {
+  margin-left: 41.4%;
+  text-decoration: underline;
+}
+
+.Signature {
+  text-decoration: overline;
+  margin-left: 30px;
+}
+
+.sig {
+  margin-left: 60%;
 }
