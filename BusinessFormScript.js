@@ -101,7 +101,7 @@ export default {
 
     fetchBusinessRecords() {
       axios
-        .get("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/data.php")
+        .get("http://localhost/bms/bmsDB/data.php")
         .then((response) => {
           if (Array.isArray(response.data)) {
             this.businessRecords = response.data;
@@ -118,7 +118,7 @@ export default {
     edit(selected) {
       selected.action = "update"; // Add the action property
       axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/crud.php", selected) // Pass the selected object directly
+        .post("http://localhost/bms/bmsDB/crud.php", selected) // Pass the selected object directly
         .then((response) => {
           console.log("Update Response:", response); // Log the response
           if (response.data.success) {
@@ -145,7 +145,7 @@ export default {
 
     removeBusiness(selected) {
       axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/crud.php", {
+        .post("http://localhost/bms/bmsDB/crud.php", {
           action: "delete",
           business_id: selected.business_id,
         })
@@ -247,7 +247,7 @@ export default {
     
       // Make a POST request to insert the new business record
       axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/crud.php", {
+        .post("http://localhost/bms/bmsDB/crud.php", {
           action: "insert",
           ...this.newBusiness,
         })

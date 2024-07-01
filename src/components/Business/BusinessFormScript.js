@@ -198,7 +198,7 @@ export default {
   methods: {
     fetchClearances() {
       axios
-        .get("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/clearanceData.php")
+        .get("http://localhost/bms/bmsDB/clearanceData.php")
         .then((response) => {
           this.clearances = response.data;
           this.filteredClearances = this.clearances;
@@ -211,7 +211,7 @@ export default {
     saveClearance() {
       const action = this.form.clearance_id ? "update" : "insert";
       axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/clearanceCRUD.php", {
+        .post("http://localhost/bms/bmsDB/clearanceCRUD.php", {
           action,
           ...this.form,
         })
@@ -279,7 +279,7 @@ export default {
 
     fetchBusinessRecords() {
       axios
-        .get("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/data.php")
+        .get("http://localhost/bms/bmsDB/data.php")
         .then((response) => {
           if (Array.isArray(response.data)) {
             this.businessRecords = response.data;
@@ -299,7 +299,7 @@ export default {
 
       // Make a POST request to update the selected business record
       axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/crud.php", selected)
+        .post("http://localhost/bms/bmsDB/crud.php", selected)
         .then((response) => {
           console.log("Update Response:", response);
 
@@ -332,7 +332,7 @@ export default {
 
     removeBusiness(selected) {
       axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/crud.php", {
+        .post("http://localhost/bms/bmsDB/crud.php", {
           action: "delete",
           business_id: selected.business_id,
         })
@@ -444,7 +444,7 @@ export default {
 
       // Make a POST request to insert the new business record
       axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/crud.php", {
+        .post("http://localhost/bms/bmsDB/crud.php", {
           action: "insert",
           ...this.newBusiness,
         })
@@ -578,7 +578,7 @@ export default {
     deleteClearanceConfirm() {
       // Perform deletion action
       axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/clearanceCRUD.php", {
+        .post("http://localhost/bms/bmsDB/clearanceCRUD.php", {
           action: "delete",
           clearance_id: this.selectedClearance.clearance_id,
         })
@@ -596,7 +596,7 @@ export default {
 
     saveEditClearance() {
       axios
-        .post("http://localhost/WEBDEV-BMS_ADMIN/bmsDB/clearanceCRUD.php", {
+        .post("http://localhost/bms/bmsDB/clearanceCRUD.php", {
           action: "update",
           clearance_id: this.selectedClearance.clearance_id,
           // Include other necessary data fields here
