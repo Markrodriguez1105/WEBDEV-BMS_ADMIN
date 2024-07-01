@@ -1,13 +1,13 @@
 <template>
     <v-row class="px-1 justify-space-between">
         <v-col class="d-flex">
-            <v-btn flat :ripple="false" icon @click="getReq()" size="small">
+            <v-btn flat :ripple="false" icon @click="reload()" size="small">
                 <v-icon>mdi-reload</v-icon>
                 <v-tooltip activator="parent" location="bottom">Reload</v-tooltip>
             </v-btn>
             <v-divider vertical class="my-2"></v-divider>
             <v-btn v-if="selected.length > 0" icon variant="plain" size="small"
-                @click="show()"><v-icon>mdi-archive-arrow-down-outline</v-icon><v-tooltip activator="parent"
+                @click="archives()"><v-icon>mdi-archive-arrow-down-outline</v-icon><v-tooltip activator="parent"
                     location="bottom">Archive</v-tooltip>
             </v-btn>
             <v-btn v-if="selected.length > 0" icon variant="plain" size="small"
@@ -24,7 +24,8 @@
         </v-col>
     </v-row>
     <v-data-table-virtual v-model="selected" show-select show-expand fixed-header :headers="headers" :items="docs"
-        height="70vh" item-value="certification_id" loading-text="Loading... Please wait" :loading="loaded" :expanded="expanded">
+        height="70vh" item-value="certification_id" loading-text="Loading... Please wait" :loading="loaded"
+        :expanded="expanded">
         <template v-slot:item.payment_status="{ value }">
             <v-chip :color="paymentStatus(value)">
                 {{ value }}
@@ -90,7 +91,8 @@
             <tr style="background-color: rgba(0, 0, 0, .1);">
                 <td :colspan="columns.length">
                     <div class="d-flex justify-end" v-if="item.archive == 1">
-                        <v-btn icon variant="plain"><v-icon>mdi-file-restore-outline</v-icon>
+                        <v-btn icon variant="plain"
+                            @click="archive(item.certification_id, item.archive)"><v-icon>mdi-file-restore-outline</v-icon>
                             <v-tooltip activator="parent" location="bottom">Restore</v-tooltip></v-btn>
                     </div>
                     <div class="d-flex justify-end" v-else>
@@ -108,8 +110,11 @@
                             icon variant="plain"><v-icon>mdi-file-move-outline</v-icon>
                             <v-tooltip activator="parent" location="bottom">Release</v-tooltip></v-btn>
                         <v-btn icon variant="plain"><v-icon>mdi-pencil</v-icon><v-tooltip activator="parent"
-                                location="bottom">Edit</v-tooltip></v-btn>
-                        <v-btn icon variant="plain"><v-icon>mdi-archive-arrow-down-outline</v-icon>
+                                location="bottom">Edit</v-tooltip>
+                                <RequestForm titleBox="Edit" icon="mdi-pencil" :selectedRow="item" :getReq="getReq" />
+                            </v-btn>
+                        <v-btn icon variant="plain"
+                            @click="archive(item.certification_id, item.archive)"><v-icon>mdi-archive-arrow-down-outline</v-icon>
                             <v-tooltip activator="parent" location="bottom">Archive</v-tooltip></v-btn>
                         <v-btn icon variant="plain"><v-icon>mdi-email-fast-outline</v-icon>
                             <v-tooltip activator="parent" location="bottom">Send Message</v-tooltip></v-btn>
@@ -118,10 +123,10 @@
             </tr>
         </template>
     </v-data-table-virtual>
-    <!-- <v-progress-linear v-else :indeterminate="loaded" color="primary"></v-progress-linear> -->
 </template>
 <script>
 import axios from 'axios';
+import RequestForm from './RequestForm.vue';
 
 export default {
     props: {
@@ -131,9 +136,12 @@ export default {
         loaded: {
             type: Boolean,
         },
+        reload: {
+            type: Function,
+        },
         getReq: {
             type: Function,
-        }
+        },
     },
     data() {
         return {
@@ -192,9 +200,28 @@ export default {
         },
         toggleExpand(certification_id) {
             if (this.expanded === certification_id) {
-                this.expanded = null; // Collapse if clicking on the same row
+                this.expanded = null;
             } else {
-                this.expanded = certification_id; // Expand the clicked row
+                this.expanded = certification_id;
+            }
+        },
+        archive(id, status) {
+            axios.post('http://localhost/bms/src/php/Request/update.php', {
+                action: 'updateArchive',
+                id: id,
+                archive: status == 1 ? 0 : 1,
+            }).then(response => {
+                if (response.data) {
+                    this.reload()
+                }
+            })
+        },
+        archives() {
+            for (let i = 0; i < this.selected.length; i++) {
+                const select = this.docs.find(doc => {
+                    return doc.certification_id == this.selected[i];
+                });
+                this.archive(select.certification_id, select.archive);
             }
         },
     },

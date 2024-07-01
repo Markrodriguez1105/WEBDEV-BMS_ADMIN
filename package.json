@@ -20,6 +20,7 @@
     "mysql": "^2.18.1",
     "mysql2": "^3.10.0",
     "roboto-fontface": "*",
+    "socket.io-client": "^4.7.5",
     "vee-validate": "^4.12.8",
     "vue": "^3.4.0",
     "vuetify": "^3.5.0"

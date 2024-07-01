@@ -1,67 +1,63 @@
 <template>
-    <v-dialog max-width="600" persistent>
-        <template v-slot:activator="{ props: activatorProps }">
-            <v-btn :disabled="user.position_id != 3" height="100%" width="100%" :prepend-icon="icon" variant="flat"
-                v-bind="activatorProps" color="primary" :text="titleBox"></v-btn>
-        </template>
-
+    <v-dialog activator="parent" max-width="500" persistent>
         <template v-slot:default="{ isActive }">
-            <v-card class="pa-5" :prepend-icon="icon" :title="titleBox">
+            <v-toolbar color="primary" class="pl-9 pr-4">
+                <v-icon>{{ icon }}</v-icon>
+                <v-toolbar-title>{{ titleBox }}</v-toolbar-title>
+                <v-btn @click="cancel(isActive)" icon="mdi-close"></v-btn>
+                <v-dialog v-model="discardOverlay" persistent max-width="500px" transition="dialog-transition">
+                    <v-card>
+                        <v-alert title="System Warning"
+                            text="Are you sure you want to cancel this transaction? Any data you have entered will not be saved and will be lost."
+                            type="warning" variant="outlined">
+                            <v-card-actions class="pa-0">
+                                <v-spacer></v-spacer>
+                                <v-btn variant="tonal" text="Cancel" @click="discardOverlay = false"></v-btn>
+                                <v-btn text="Discard"
+                                    @click="setForm(), isActive.value = false, discardOverlay = false"></v-btn>
+                            </v-card-actions>
+                        </v-alert>
+                    </v-card>
+                </v-dialog>
+            </v-toolbar>
+            <v-card class="pa-3" rounded="0">
                 <v-form @submit.prevent="submit(isActive)" class="ma-7 d-flex flex-column ga-2">
-                    <div class="d-flex flex-column ga-2">
-                        <v-row>
-                            <v-combobox class="input" v-model="doc.resident_id" label="Resident Name *"
-                                :rules="[v => !!v || 'Required', v => residents.includes(v) || 'Not Resident']"
-                                :items="residents" item-title="name" variant="solo-filled"></v-combobox>
-                        </v-row>
-                        <v-row>
-                            <v-text-field :disabled="!residents.includes(doc.resident_id)" v-model="doc.email" clearable
-                                label="Email *" :rules="[v => !v || /^[a-z0-9.-]+@[a-z.-]+\.[a-z]+$/i.test(v)
-                                    || 'Invalid Email']" variant="outlined"></v-text-field>
-                        </v-row>
-                        <v-row>
-                            <v-text-field :disabled="!residents.includes(doc.resident_id)" v-model="doc.phone_num"
-                                clearable label="Phone Number *"
-                                :rules="[v => !v || (/^09\d{9}$/.test(v) || /^\+639\d{9}$/.test(v)) || 'Invalid Phone Number']"
-                                variant="outlined"></v-text-field>
-                        </v-row>
-                        <v-row>
-                            <v-combobox :disabled="!residents.includes(doc.resident_id)" v-model="doc.document_type"
-                                label="Document Type *" :items="documents" item-title="description"
-                                item-value="document_id"
-                                :rules="[v => !!v || 'Required', v => documents.includes(v) || 'Not a Document']"
-                                variant="outlined"></v-combobox>
-                        </v-row>
-                        <v-row>
-                            <v-text-field :disabled="!residents.includes(doc.resident_id)" v-model="doc.purpose"
-                                clearable label="Purpose *" :rules="[v => !!v || 'Required']"
-                                variant="outlined"></v-text-field>
-                        </v-row>
-                        <v-row>
-                            <v-text-field :disabled="!residents.includes(doc.resident_id)" v-model="doc.date_release"
-                                type="date" clearable label="Release Date *" :rules="[v => !!v || 'Required']"
-                                variant="outlined" :min="getCurrentDate()"></v-text-field>
-                        </v-row>
-                    </div>
-                    <v-row class="d-flex justify-end ma-0 pa-0 ga-2">
-                        <v-btn size="large" text="Cancel" @click="cancel(isActive)" prepend-icon="mdi-close"
-                            flat></v-btn>
-                        <v-dialog v-model="discardOverlay" persistent max-width="500px" transition="dialog-transition">
-                            <v-card>
-                                <v-alert title="System Warning"
-                                    text="Are you sure you want to cancel this transaction? Any data you have entered will not be saved and will be lost."
-                                    type="warning" variant="outlined">
-                                    <v-card-actions class="pa-0">
-                                        <v-spacer></v-spacer>
-                                        <v-btn variant="tonal" text="Cancel" @click="discardOverlay = false"></v-btn>
-                                        <v-btn text="Discard"
-                                            @click="setForm(), isActive.value = false, discardOverlay = false"></v-btn>
-                                    </v-card-actions>
-                                </v-alert>
-                            </v-card>
-                        </v-dialog>
-                        <v-btn :disabled="!residents.includes(doc.resident_id)" color="primary" size="large"
-                            text="Submit" type="submit" prepend-icon="mdi-content-save-check" variant="flat"></v-btn>
+                    <v-row>
+                        <v-combobox class="input" v-model="doc.resident" label="Resident Name *"
+                            :rules="[v => !!v || 'Required', v => residents.includes(v) || 'Not Resident']"
+                            :items="residents" item-title="name" variant="solo-filled"></v-combobox>
+                    </v-row>
+                    <v-row>
+                        <v-text-field :disabled="!isResident" :readonly="btnSubmit.disable" v-model="doc.email"
+                            clearable label="Email *" :rules="[v => !v || /^[a-z0-9.-]+@[a-z.-]+\.[a-z]+$/i.test(v)
+                                || 'Invalid Email']" variant="outlined"></v-text-field>
+                    </v-row>
+                    <v-row>
+                        <v-text-field :disabled="!isResident" :readonly="btnSubmit.disable" v-model="doc.phone_num"
+                            clearable label="Phone Number *"
+                            :rules="[v => !v || (/^09\d{9}$/.test(v) || /^\+639\d{9}$/.test(v)) || 'Invalid Phone Number']"
+                            variant="outlined"></v-text-field>
+                    </v-row>
+                    <v-row>
+                        <v-combobox :disabled="!isResident" :readonly="btnSubmit.disable" v-model="doc.document_type"
+                            label="Document Type *" :items="documents" item-title="description" item-value="document_id"
+                            :rules="[v => !!v || 'Required', v => documents.includes(v) || 'Not a Document']"
+                            variant="outlined"></v-combobox>
+                    </v-row>
+                    <v-row>
+                        <v-text-field :disabled="!isResident" :readonly="btnSubmit.disable" v-model="doc.purpose"
+                            clearable label="Purpose *" :rules="[v => !!v || 'Required']"
+                            variant="outlined"></v-text-field>
+                    </v-row>
+                    <v-row>
+                        <v-text-field :disabled="!isResident" :readonly="btnSubmit.disable" v-model="doc.date_release"
+                            type="date" label="Release Date *" :rules="[v => !!v || 'Required']" variant="outlined"
+                            :min="getCurrentDate()"></v-text-field>
+                    </v-row>
+                    <v-row>
+                        <v-btn :loading="btnSubmit.loading" :disabled="!isResident" :readonly="btnSubmit.disable"
+                            :color="btnSubmit.color" size="large" :text="btnSubmit.title" type="submit"
+                            :prepend-icon="btnSubmit.icon" variant="flat" block></v-btn>
                     </v-row>
                 </v-form>
             </v-card>
@@ -92,19 +88,12 @@ export default {
             type: String,
             require: true,
         },
-        user: {
-            type: Object,
-        }
     },
     data: () => ({
-        isRegistered: {
-            color: 'success', text: 'Cedula Registered'
-        },
         discardOverlay: false,
-        dialogForm: false,
         doc: {
             certification_id: '',
-            resident_id: {
+            resident: {
                 name: '',
                 id: '',
             },
@@ -113,50 +102,115 @@ export default {
             document_type: '',
             purpose: '',
             date_release: '',
-            document_cost: '',
-            stamp_fee: '',
-            total: '',
-            fee: '',
+        },
+        btnSubmit: {
+            disable: false,
+            icon: 'mdi-content-save',
+            loading: false,
+            title: 'Submit',
+            color: 'primary'
         },
         residents: [],
         documents: [],
     }),
     methods: {
         submit(isActive) {
-            this.genDocId();
+            if (this.doc.document_type && this.doc.purpose && this.doc.date_release) {
+                this.btnSubmit.loading = true;
+                this.btnSubmit.disable = true;
+                if (this.selectedRow) {
+                    axios.post('http://localhost/bms/src/php/Request/update.php', {
+                        action: 'update',
+                        certification_id: selectedRow.certification_id,
+                        email: this.doc.email,
+                        phone_num: this.doc.phone_num,
+                        document_type: this.doc.document_type.document_id,
+                        purpose: this.doc.purpose,
+                        release_date: this.doc.date_release,
+                    }).then(response => {
+                        setTimeout(() => {
+                            if (response.data) {
+                                this.btnSubmit.loading = false;
+                                this.btnSubmit.icon = 'mdi-check'
+                                this.btnSubmit.color = 'success';
+                                this.btnSubmit.title = 'Updated';
+                                this.getReq();
+                                setTimeout(() => {
+                                    isActive.value = false;
+                                }, 500);
+                            }
+                        }, 1000);
+                    });
+                } else {
+                    this.doc.certification_id = this.generateId();
+                    axios.post('http://localhost/bms/src/php/Request/insert.php', {
+                        action: 'insert',
+                        certification: this.doc.certification_id,
+                        id: this.doc.resident.id,
+                        email: this.doc.email,
+                        phone_num: this.doc.phone_num,
+                        document_type: this.doc.document_type.document_id,
+                        purpose: this.doc.purpose,
+                        release_date: this.doc.date_release,
+                    }).then(response => {
+                        setTimeout(() => {
+                            if (response.data) {
+                                this.btnSubmit.loading = false;
+                                this.btnSubmit.icon = 'mdi-check'
+                                this.btnSubmit.color = 'success';
+                                this.btnSubmit.title = 'Submited';
+                                this.getReq();
+                                setTimeout(() => {
+                                    isActive.value = false;
+                                }, 500);
+                            } else {
+                                this.btnSubmit.loading = false;
+                                this.btnSubmit.icon = 'mdi-close'
+                                this.btnSubmit.color = 'error';
+                                this.btnSubmit.title = 'Failed';
+                            }
+                        }, 1000)
+                    }).catch(error => {
+                        console.error(error);
+                        this.btnSubmit.loading = false;
+                        this.btnSubmit.icon = 'mdi-close'
+                        this.btnSubmit.color = 'error';
+                        this.btnSubmit.title = 'Failed';
+                    })
+                }
+            }
 
-            axios.post('http://localhost/bms/src/php/Request/insert.php', {
-                action: 'insert',
-                certification: this.doc.certification_id,
-                resident_id: this.doc.resident_id.id,
-                email: this.doc.email,
-                phone_num: this.doc.phone_num,
-                document_type: this.doc.document_type.document_id,
-                purpose: this.doc.purpose,
-                release_date: this.doc.date_release,
-            }).then(response => {
-                isActive.value = response.data;
-                this.getReq();
-            });
 
         },
         setForm() {
             if (this.selectedRow) {
-                this.doc = this.selectedRow
-                this.doc.resident_id = this.fullName(this.selectedRow);
+                this.doc.resident = this.residents.find(person => {
+                    person.name == this.selectedRow.full_name;
+                });
+                
+                this.btnSubmit = {
+                    icon: 'mdi-pencil',
+                    loading: false,
+                    title: 'Update',
+                    color: 'primary',
+                }
             } else {
                 this.doc = {
-                    resident_id: '',
+                    resident: '',
                     email: '',
                     phoneNum: '',
                     documentType: '',
                     purpose: '',
-                    document_cost: '',
-                    stamp_fee: '',
-                    total: '',
-                    fee: '',
+                    date_release: '',
+                }
+                this.btnSubmit = {
+                    icon: 'mdi-content-save',
+                    loading: false,
+                    title: 'Submit',
+                    color: 'primary'
                 }
             }
+
         },
         fullName(item) {
             const { lname, fname, mname, suffix } = item;
@@ -170,8 +224,9 @@ export default {
                 isActive.value = false;
             }
         },
-        genDocId() {
+        generateId() {
             let dublication = false;
+            let uniqueId = '';
             do {
                 let min = 1;
                 let max = 99999;
@@ -183,14 +238,17 @@ export default {
                     id: id,
                 });
                 dublication = result.data;
-                this.doc.certification_id = id;
+                uniqueId = id;
             } while (dublication);
+
+            return uniqueId;
 
         },
         getResident() {
             axios.post('http://localhost/bms/src/php/Request/fetch.php', {
-                action: 'getAll',
+                action: 'getResident',
             }).then(response => {
+                console.log(response.data);
                 this.residents = response.data;
             })
         },
@@ -204,7 +262,7 @@ export default {
         cedulaValidate() {
             axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'cedulaValidate',
-                id: this.doc.resident_id.id,
+                id: this.doc.resident.id,
             }).then(response => {
                 if (!response.data) {
                     this.isRegistered.color = 'error';
@@ -217,9 +275,7 @@ export default {
         },
         getCurrentDate() {
             const today = new Date();
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate());
-            return yesterday.toISOString().split('T')[0];
+            return today.toISOString().split('T')[0];
         }
     },
     computed: {
@@ -228,14 +284,16 @@ export default {
         },
         totalChange() {
             return Number.isNaN(parseInt(this.doc.fee) - parseInt(this.doc.total)) ? 0 : parseInt(this.doc.fee) - parseInt(this.doc.total);
+        },
+        isResident() {
+            return this.residents.includes(this.doc.resident) || this.selectedRow;
         }
     },
     mounted() {
-        this.setForm();
         this.getResident();
         this.getDocuments();
+        this.setForm();
     }
 }
 </script>
-<style>
-</style>
+<style></style>

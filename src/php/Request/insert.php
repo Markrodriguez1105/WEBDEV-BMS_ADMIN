@@ -16,28 +16,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
         header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
     exit(0);
 }
-    if ($req->action == 'insert') {
-        $stmt = $conn->prepare("INSERT INTO certification (certification_id, resident_id, phone_num, email, document_id, purpose, release_date) VALUES (?, ?, ?, ?, ?, ?, ?);");
-        $stmt->bind_param("sssssss", $req->certification, $req->resident_id, $req->phone_num, $req->email, $req->document_type, $req->purpose, $req->release_date);
-        $result = $stmt->execute();
-        if ($result) {
-            echo json_encode(false);
-        } else {
-            echo json_encode(true);
-        }
-        $stmt->close();
-    }
+$req = json_decode(file_get_contents("php://input"));
 
-    if ($req->action == 'insertPayment') {
-        $stmt = $conn->prepare("INSERT INTO `certificationtreasury` (`document_id`, `stamp_fee`, `document_cost`, `fee`) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $req->certification, $req->stamp_fee, $req->document_cost, $req->fee);
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true]);
-        } else {
-            echo json_encode(['success' => false, 'error' => $stmt->error]);
-        }
-        $stmt->close();
+if ($req->action == 'insert') {
+    $stmt = $conn->prepare("INSERT INTO certification (certification_id, resident_id, phone_num, email, document_id, purpose, release_date) VALUES (?, ?, ?, ?, ?, ?, ?);");
+    $stmt->bind_param("sssssss", $req->certification, $req->id, $req->phone_num, $req->email, $req->document_type, $req->purpose, $req->release_date);
+    if ($stmt->execute()) {
+        echo json_encode(true);
+    } else {
+        echo json_encode(false);
     }
+    $stmt->close();
+}
 
+if ($req->action == 'insertPayment') {
+    $stmt = $conn->prepare("INSERT INTO `certificationtreasury` (`document_id`, `stamp_fee`, `document_cost`, `fee`) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $req->certification, $req->stamp_fee, $req->document_cost, $req->fee);
+    if ($stmt->execute()) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => $stmt->error]);
+    }
+    $stmt->close();
 }
 $conn->close();

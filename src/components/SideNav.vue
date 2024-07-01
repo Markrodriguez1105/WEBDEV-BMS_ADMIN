@@ -21,7 +21,7 @@
     <v-divider></v-divider>
 
     <v-list>
-      <v-list-item class="navigationsIcons" prepend-icon="mdi-arrow-left-box" title="Log out" min-height="50" to="/Login"></v-list-item>
+      <v-list-item class="navigationsIcons" prepend-icon="mdi-arrow-left-box" title="Log out" min-height="50" to="/Landing"></v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
