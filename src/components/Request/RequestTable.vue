@@ -5,15 +5,6 @@
                 <v-icon>mdi-reload</v-icon>
                 <v-tooltip activator="parent" location="bottom">Reload</v-tooltip>
             </v-btn>
-            <v-divider vertical class="my-2"></v-divider>
-            <v-btn v-if="selected.length > 0" icon variant="plain" size="small"
-                @click="archives()"><v-icon>mdi-archive-arrow-down-outline</v-icon><v-tooltip activator="parent"
-                    location="bottom">Archive</v-tooltip>
-            </v-btn>
-            <v-btn v-if="selected.length > 0" icon variant="plain" size="small"
-                @click="show()"><v-icon>mdi-delete-outline</v-icon><v-tooltip activator="parent"
-                    location="bottom">Delete</v-tooltip>
-            </v-btn>
         </v-col>
         <v-col cols="auto" class="d-flex">
             <v-divider vertical class="my-2"></v-divider>
@@ -23,16 +14,15 @@
             </v-btn>
         </v-col>
     </v-row>
-    <v-data-table-virtual v-model="selected" show-select show-expand fixed-header :headers="headers" :items="docs"
-        height="70vh" item-value="certification_id" loading-text="Loading... Please wait" :loading="loaded"
-        :expanded="expanded">
+    <v-data-table-virtual show-expand fixed-header :headers="headers" :items="docs" height="70vh"
+        item-value="certification_id" loading-text="Loading... Please wait" :loading="loaded" :expanded="expanded">
         <template v-slot:item.payment_status="{ value }">
-            <v-chip :color="paymentStatus(value)">
+            <v-chip :color="paymentStatus(value)" variant="outlined">
                 {{ value }}
             </v-chip>
         </template>
-        <template v-slot:item.isReleased="{ value }">
-            <v-chip :color="isReleasedStatus(value)">
+        <template v-slot:item.doc_status="{ value }">
+            <v-chip :color="doc_status(value)" variant="outlined">
                 {{ value }}
             </v-chip>
         </template>
@@ -42,7 +32,6 @@
 
         <template v-slot:expanded-row="{ columns, item }">
             <tr style="background-color: rgba(0, 0, 0, .1);">
-                <td></td>
                 <td>
                     <p>Release Date</p>
                     <h4>{{ date(item.release_date).toLocaleDateString() }}</h4>
@@ -63,10 +52,15 @@
                     <p>Nationality</p>
                     <h4>{{ item.nationality }}</h4>
                 </td>
-                <td></td>
+                <td :colspan="columns.length"></td>
             </tr>
             <tr style="background-color: rgba(0, 0, 0, .1);">
-                <td></td>
+                <td>
+                    <p>Release Status</p>
+                    <h4>
+                        {{ item.isReleased }}
+                    </h4>
+                </td>
                 <td>
                     <p>Phone Number</p>
                     <h4 style="cursor: pointer;" @click="copyToClipboard(item.phone_num)">{{ item.phone_num }}
@@ -101,18 +95,26 @@
                             <v-tooltip activator="parent" location="bottom">Print</v-tooltip>
                         </v-btn>
                         <v-btn v-else icon variant="text"><v-icon>mdi-cash</v-icon><v-tooltip activator="parent"
-                                location="bottom">Payment</v-tooltip></v-btn>
+                                location="bottom">Payment</v-tooltip>
+                            <RequestPayment :selectedRow="item" :reload="reload" />
+                        </v-btn>
+                        <v-btn icon variant="text"><v-icon>mdi-card-text-outline</v-icon>
+                            <v-tooltip activator="parent" location="bottom">Action</v-tooltip>
+                        <RequestApproval :getReq="getReq" :selectedRow="item"/>
+                        </v-btn>
 
                         <v-divider vertical class="my-2"></v-divider>
 
                         <v-btn
                             v-if="item.isReleased.toLowerCase() == 'not released' && item.payment_status.toLowerCase() == 'paid'"
-                            icon variant="plain"><v-icon>mdi-file-move-outline</v-icon>
+                            icon variant="plain"
+                            @click="isRelased(item.certification_id, 0)"><v-icon>mdi-file-move-outline</v-icon>
                             <v-tooltip activator="parent" location="bottom">Release</v-tooltip></v-btn>
-                        <v-btn icon variant="plain"><v-icon>mdi-pencil</v-icon><v-tooltip activator="parent"
-                                location="bottom">Edit</v-tooltip>
-                                <RequestForm titleBox="Edit" icon="mdi-pencil" :selectedRow="item" :getReq="getReq" />
-                            </v-btn>
+                        <v-btn icon variant="plain"
+                            v-if="item.payment_status == 'Not Paid'"><v-icon>mdi-pencil</v-icon><v-tooltip
+                                activator="parent" location="bottom">Edit</v-tooltip>
+                            <RequestForm titleBox="Edit" icon="mdi-pencil" :selectedRow="item" :getReq="getReq" />
+                        </v-btn>
                         <v-btn icon variant="plain"
                             @click="archive(item.certification_id, item.archive)"><v-icon>mdi-archive-arrow-down-outline</v-icon>
                             <v-tooltip activator="parent" location="bottom">Archive</v-tooltip></v-btn>
@@ -127,6 +129,7 @@
 <script>
 import axios from 'axios';
 import RequestForm from './RequestForm.vue';
+import RequestPayment from './RequestPayment.vue';
 
 export default {
     props: {
@@ -145,14 +148,13 @@ export default {
     },
     data() {
         return {
-            selected: [],
             expanded: [],
             headers: [
                 { title: 'Date Requested', align: 'start', width: 200, key: 'date_request' },
                 { title: 'Name', align: 'start', width: 300, key: 'full_name' },
                 { title: 'Document Type', align: 'start', width: 200, key: 'document_type' },
                 { title: 'Payment Status', align: 'start', width: 200, key: 'payment_status' },
-                { title: 'Release Status', align: 'start', width: 200, key: 'isReleased' },
+                { title: 'Approval Status', align: 'start', width: 200, key: 'doc_status' },
             ]
         }
     },
@@ -172,11 +174,13 @@ export default {
                 return 'red';
             }
         },
-        isReleasedStatus(value) {
-            if (value.toLowerCase() == 'released') {
+        doc_status(value) {
+            if (value.toLowerCase() == 'approved') {
                 return 'green';
-            } else {
+            } else if (value.toLowerCase() == 'declined') {
                 return 'red';
+            } else {
+                return 'yellow-darken-2'
             }
         },
         getAge(birth_date) {
@@ -191,9 +195,6 @@ export default {
         },
         copyToClipboard(text) {
             navigator.clipboard.writeText(text);
-        },
-        show() {
-            console.log(this.selected);
         },
         collapseAll() {
             this.expanded = [];
@@ -216,19 +217,21 @@ export default {
                 }
             })
         },
-        archives() {
-            for (let i = 0; i < this.selected.length; i++) {
-                const select = this.docs.find(doc => {
-                    return doc.certification_id == this.selected[i];
-                });
-                this.archive(select.certification_id, select.archive);
-            }
+        isRelased(id, status) {
+            axios.post('http://localhost/bms/src/php/Request/update.php', {
+                action: 'updateRelease',
+                id: id,
+                isReleased: status == 1 ? 0 : 1,
+            }).then(response => {
+                if (response.data) {
+                    this.reload()
+                }
+            })
         },
     },
     watch: {
         loaded(newVal) {
             if (newVal) {
-                this.selected = [];
                 this.expanded = [];
             }
         },

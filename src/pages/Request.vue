@@ -13,12 +13,12 @@
         <v-row>
             <v-col cols="2" class="d-flex flex-column ga-2">
                 <div style="height: 7vh; width: 10rem;">
-                    <v-btn :disabled="user.position_id != 3" height="100%" width="100%"
+                    <v-btn :disabled="user.position_id != 3" height="100%" width="100%" id="activator-target"
                         prepend-icon="mdi-file-document-edit" variant="flat" color="primary">New Request
-                        <RequestForm :getReq="getReq" icon="mdi-file-document-edit" titleBox="New Request" />
                     </v-btn>
+                    <RequestForm :getReq="getReq" icon="mdi-file-document-edit" titleBox="New Request" />
                 </div>
-                <v-list v-model:selected="navSelected">
+                <v-list mandatory v-model:selected="navSelected">
                     <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20"
                         @click="getReq()" value="all">
                         <div class="d-flex justify-space-between align-center">
@@ -26,7 +26,25 @@
                                 <v-icon size="small">mdi-text-box-multiple-outline</v-icon>
                                 <p>All Requests</p>
                             </div>
-                            <span>{{ document.length }}</span>
+                            <span>{{ countAllDocument }}</span>
+                        </div>
+                    </v-list-item>
+                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click=""
+                        value="approved">
+                        <div class="d-flex justify-space-between align-center">
+                            <div class="d-flex ga-2 align-center">
+                                <v-icon size="small">mdi-thumb-up-outline</v-icon>
+                                <p>Approved</p>
+                            </div>
+                        </div>
+                    </v-list-item>
+                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click=""
+                        value="declined">
+                        <div class="d-flex justify-space-between align-center">
+                            <div class="d-flex ga-2 align-center">
+                                <v-icon size="small">mdi-thumb-down-outline</v-icon>
+                                <p>Declined</p>
+                            </div>
                         </div>
                     </v-list-item>
                     <v-list-group>
@@ -42,23 +60,21 @@
                         </template>
 
                         <v-list-item class="navigationsIcons" rounded min-height="20" color="primary"
-                            @click="filtered = getFilterPayment('Pending')" value="pending">
+                            @click="getFilterPayment(0)" value="pending">
                             <div class="d-flex justify-space-between align-center">
                                 <div class="d-flex ga-2 align-center">
                                     <v-icon>mdi-cash-clock</v-icon>
                                     <p>Pending</p>
                                 </div>
-                                <span>{{ getFilterPayment("Pending").length }}</span>
                             </div>
                         </v-list-item>
                         <v-list-item class="navigationsIcons" rounded min-height="20" color="primary"
-                            @click="filtered = getFilterPayment('Paid')" value="paid">
+                            @click="getFilterPayment(1)" value="paid">
                             <div class="d-flex justify-space-between align-center">
                                 <div class="d-flex ga-2 align-center">
                                     <v-icon>mdi-cash-check</v-icon>
                                     <p>Paid</p>
                                 </div>
-                                <span>{{ getFilterPayment("Paid").length }}</span>
                             </div>
                         </v-list-item>
                     </v-list-group>
@@ -75,23 +91,21 @@
                         </template>
 
                         <v-list-item class="navigationsIcons" rounded min-height="20" color="primary"
-                            @click="filtered = getFilterRelease('Not Released')" value="not_released">
+                            @click="document = getFilterRelease(0)" value="not_released">
                             <div class="d-flex justify-space-between align-center">
                                 <div class="d-flex ga-2 align-center">
                                     <v-icon>mdi-file-clock-outline</v-icon>
                                     <p>Not Released</p>
                                 </div>
-                                <span>{{ getFilterRelease("Not Released").length }}</span>
                             </div>
                         </v-list-item>
                         <v-list-item class="navigationsIcons" rounded min-height="20" color="primary"
-                            @click="filtered = getFilterRelease('Released')" value="released">
+                            @click="document = getFilterRelease(1)" value="released">
                             <div class="d-flex justify-space-between align-center">
                                 <div class="d-flex ga-2 align-center">
                                     <v-icon>mdi-file-document-check-outline</v-icon>
                                     <p>Released</p>
                                 </div>
-                                <span>{{ getFilterRelease("Released").length }}</span>
                             </div>
                         </v-list-item>
                     </v-list-group>
@@ -108,18 +122,17 @@
                         </template>
 
                         <v-list-item class="navigationsIcons" rounded min-height="20" color="primary"
-                            @click="filtered = getByCategory(item.document_type)" :value="item.document_type"
-                            v-for="item in documentTypeList" :key="item.document_type">
+                            @click="getByCategory(item.document_id)" :value="item.document_id"
+                            v-for="item in document_type" :key="item.document_type">
                             <div class="d-flex justify-space-between align-center">
                                 <div class="d-flex ga-2 align-center">
                                     <v-icon>mdi-file-document-outline</v-icon>
                                     <p>{{ item.document_type }}</p>
                                 </div>
-                                <span>{{ getByCategory(item.document_type).length }}</span>
                             </div>
                         </v-list-item>
                     </v-list-group>
-                    <v-list-item color="primary" variant="text" rounded min-height="20" @click="getArchive()"
+                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click="getArchive()"
                         value="archive">
                         <div class="d-flex justify-space-between align-center">
                             <div class="d-flex ga-2 align-center">
@@ -128,7 +141,7 @@
                             </div>
                         </div>
                     </v-list-item>
-                    <v-list-item color="primary" variant="text" rounded min-height="20" value="setting">
+                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" value="setting" @click="show()">
                         <div class="d-flex justify-space-between align-center">
                             <div class="d-flex ga-2 align-center">
                                 <v-icon size="small">mdi-cog</v-icon>
@@ -137,7 +150,6 @@
                         </div>
                     </v-list-item>
                 </v-list>
-                <v-btn color="success" @click="show()">Test</v-btn>
             </v-col>
             <v-col>
                 <v-card>
@@ -196,13 +208,14 @@ export default {
             selectFilter: '1',
             loaded: false,
             document: [],
-            filtered: [],
+            countAllDocument: '',
+            document_type: [],
             previous: ['all'],
         }
     },
     methods: {
         show() {
-            console.log();
+            console.log(this.$refs);
         },
         async fetchPhp(action) {
             try {
@@ -216,43 +229,91 @@ export default {
         },
         async getReq() {
             this.loaded = true;
-            this.filtered = [];
             const response = await this.fetchPhp('fetchAll');
+            this.document = [];
+
             setTimeout(() => {
                 if (response) {
-                    console.log(response);
                     this.document = response;
-                    this.filtered = this.document;
                 }
                 this.loaded = false;
             }, 1000);
+        },
+        async getCountDocuments() {
+            const response = await this.fetchPhp('getCountDocuments');
+            this.countAllDocument = response;
         },
         async getArchive() {
             this.loaded = true;
-            this.filtered = [];
+            this.document = [];
             const response = await this.fetchPhp('getArchive');
+
             setTimeout(() => {
                 if (response) {
-                    this.filtered = response;
+                    this.document = response;
                 }
                 this.loaded = false;
             }, 1000);
         },
-        getByCategory(type) {
-            return this.document.filter(item => {
-                return item.document_type == type;
+        async getDeclined() {
+            this.loaded = true;
+            this.document = [];
+            const response = await this.fetchPhp('getDeclined');
+
+            setTimeout(() => {
+                if (response) {
+                    this.document = response;
+                }
+                this.loaded = false;
+            }, 1000);
+        },
+        async getByCategory(document_id) {
+            this.loaded = true;
+            this.document = [];
+
+            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
+                action: 'getByCategory',
+                document_id: document_id,
+            }).then(response => {
+                setTimeout(() => {
+                    if (response.data) {
+                        this.document = response.data;
+                    }
+                    this.loaded = false;
+                }, 1000);
             });
         },
-        getFilterRelease(type) {
-            return this.document.filter(doc =>
-                doc.isReleased.toLowerCase() == type.toLowerCase()
-            );
-        },
-        getFilterPayment(type) {
-            return this.document.filter(doc =>
-                doc.payment_status.toLowerCase() == type.toLowerCase()
-            );
+        getFilterPayment(status) {
+            this.loaded = true;
+            this.document = [];
 
+            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
+                action: 'getFilterPayment',
+                status: status,
+            }).then(response => {
+                setTimeout(() => {
+                    if (response.data) {
+                        this.document = response.data;
+                    }
+                    this.loaded = false;
+                }, 1000);
+            });
+        },
+        getFilterRelease(status) {
+            this.loaded = true;
+            this.document = [];
+
+            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
+                action: 'getFilterRelease',
+                status: status,
+            }).then(response => {
+                setTimeout(() => {
+                    if (response.data) {
+                        this.document = response.data;
+                    }
+                    this.loaded = false;
+                }, 1000);
+            });
         },
         reload() {
             switch (this.navSelected.toLocaleString()) {
@@ -263,34 +324,32 @@ export default {
                     this.getArchive();
                     break;
                 case "not_released":
-                    this.filtered = this.getFilterRelease("Not Released");
+                    this.getFilterRelease("Not Released");
                     break;
                 case "released":
-                    this.filtered = this.getFilterRelease("Released");
+                    this.getFilterRelease("Released");
                     break;
                 case "paid":
-                    this.filtered = this.getFilterPayment("Paid");
+                    this.getFilterPayment("Paid");
                     break;
                 case "pending":
-                    this.filtered = this.getFilterPayment("Pending");
+                    this.getFilterPayment("Pending");
                     break;
                 default:
-                    this.filtered = this.getByCategory(this.navSelected.toLocaleString());
+                    this.getByCategory(this.navSelected.toLocaleString());
                     break;
             }
-        }
+            this.getCountDocuments();
+            this.documentTypeList();
+        },
+        async documentTypeList() {
+            const response = await this.fetchPhp('getDocumentType');
+            this.document_type = response;
+        },
     },
     computed: {
-        documentTypeList() {
-            const seen = new Set();
-            return this.document.filter(item => {
-                const isDuplicate = seen.has(item.document_type);
-                seen.add(item.document_type);
-                return !isDuplicate;
-            });
-        },
         filteredDocuments() {
-            let filteredDocs = this.filtered;
+            let filteredDocs = this.document;
 
             if (this.search) {
                 filteredDocs = filteredDocs.filter(doc =>
@@ -302,15 +361,6 @@ export default {
     },
     mounted() {
         this.reload();
-    },
-    watch: {
-        navSelected(newVal) {
-            if (this.navSelected.length == 0) {
-                this.navSelected = this.previous
-            } else {
-                this.previous = newVal;
-            }
-        }
     },
 }
 </script>

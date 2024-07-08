@@ -6,7 +6,7 @@
                 <v-toolbar-title>{{ titleBox }}</v-toolbar-title>
                 <v-btn @click="cancel(isActive)" icon="mdi-close"></v-btn>
                 <v-dialog v-model="discardOverlay" persistent max-width="500px" transition="dialog-transition">
-                    <v-card>
+                    <v-card class="pa-3" rounded="0">
                         <v-alert title="System Warning"
                             text="Are you sure you want to cancel this transaction? Any data you have entered will not be saved and will be lost."
                             type="warning" variant="outlined">
@@ -21,9 +21,10 @@
                 </v-dialog>
             </v-toolbar>
             <v-card class="pa-3" rounded="0">
-                <v-form @submit.prevent="submit(isActive)" class="ma-7 d-flex flex-column ga-2">
+                <v-form ref="form" @submit.prevent="submit(isActive)" class="ma-7 d-flex flex-column ga-2">
                     <v-row>
                         <v-combobox class="input" v-model="doc.resident" label="Resident Name *"
+                            :readonly="btnSubmit.disable" :disabled="selectedRow != null"
                             :rules="[v => !!v || 'Required', v => residents.includes(v) || 'Not Resident']"
                             :items="residents" item-title="name" variant="solo-filled"></v-combobox>
                     </v-row>
@@ -35,12 +36,13 @@
                     <v-row>
                         <v-text-field :disabled="!isResident" :readonly="btnSubmit.disable" v-model="doc.phone_num"
                             clearable label="Phone Number *"
-                            :rules="[v => !v || (/^09\d{9}$/.test(v) || /^\+639\d{9}$/.test(v)) || 'Invalid Phone Number']"
+                            :rules="[v => !!v || 'Required', v => (/^09\d{9}$/.test(v) || /^\+639\d{9}$/.test(v)) || 'Invalid Phone Number']"
                             variant="outlined"></v-text-field>
                     </v-row>
                     <v-row>
-                        <v-combobox :disabled="!isResident" :readonly="btnSubmit.disable" v-model="doc.document_type"
-                            label="Document Type *" :items="documents" item-title="description" item-value="document_id"
+                        <v-combobox :disabled="!isResident || selectedRow != null" :readonly="btnSubmit.disable"
+                            v-model="doc.document_type" label="Document Type *" :items="documents"
+                            item-title="description" item-value="document_id"
                             :rules="[v => !!v || 'Required', v => documents.includes(v) || 'Not a Document']"
                             variant="outlined"></v-combobox>
                     </v-row>
@@ -94,12 +96,15 @@ export default {
         doc: {
             certification_id: '',
             resident: {
-                name: '',
                 id: '',
+                name: '',
             },
             email: '',
             phone_num: '',
-            document_type: '',
+            document_type: {
+                document_id: '',
+                description: ''
+            },
             purpose: '',
             date_release: '',
         },
@@ -114,17 +119,18 @@ export default {
         documents: [],
     }),
     methods: {
-        submit(isActive) {
-            if (this.doc.document_type && this.doc.purpose && this.doc.date_release) {
+        async submit(isActive) {
+            await this.$refs.form.validate();
+            if (await this.$refs.form.isValid) {
                 this.btnSubmit.loading = true;
                 this.btnSubmit.disable = true;
                 if (this.selectedRow) {
                     axios.post('http://localhost/bms/src/php/Request/update.php', {
-                        action: 'update',
-                        certification_id: selectedRow.certification_id,
+                        action: 'updateReq',
+                        certification_id: this.selectedRow.certification_id,
                         email: this.doc.email,
                         phone_num: this.doc.phone_num,
-                        document_type: this.doc.document_type.document_id,
+                        document_id: this.doc.document_type.document_id,
                         purpose: this.doc.purpose,
                         release_date: this.doc.date_release,
                     }).then(response => {
@@ -134,10 +140,16 @@ export default {
                                 this.btnSubmit.icon = 'mdi-check'
                                 this.btnSubmit.color = 'success';
                                 this.btnSubmit.title = 'Updated';
-                                this.getReq();
                                 setTimeout(() => {
                                     isActive.value = false;
+                                    this.setForm();
+                                    this.getReq();
                                 }, 500);
+                            } else {
+                                this.btnSubmit.loading = false;
+                                this.btnSubmit.icon = 'mdi-close'
+                                this.btnSubmit.color = 'error';
+                                this.btnSubmit.title = 'Failed';
                             }
                         }, 1000);
                     });
@@ -159,8 +171,9 @@ export default {
                                 this.btnSubmit.icon = 'mdi-check'
                                 this.btnSubmit.color = 'success';
                                 this.btnSubmit.title = 'Submited';
-                                this.getReq();
                                 setTimeout(() => {
+                                    this.setForm();
+                                    this.getReq();
                                     isActive.value = false;
                                 }, 500);
                             } else {
@@ -179,30 +192,39 @@ export default {
                     })
                 }
             }
-
-
         },
-        setForm() {
+        async setForm() {
             if (this.selectedRow) {
-                this.doc.resident = this.residents.find(person => {
-                    person.name == this.selectedRow.full_name;
-                });
-                
+                this.doc.certification_id = this.selectedRow.certification_id;
+                this.doc.resident = this.residents.find(person => person.id == this.selectedRow.resident_id);
+
+                this.doc.email = this.selectedRow.email;
+                this.doc.phone_num = this.selectedRow.phone_num;
+
+                this.doc.document_type = this.documents.find(doc => doc.document_id == this.selectedRow.document_id);
+
+                this.doc.purpose = this.selectedRow.purpose;
+                this.doc.date_release = this.selectedRow.release_date;
+
+
                 this.btnSubmit = {
                     icon: 'mdi-pencil',
                     loading: false,
                     title: 'Update',
                     color: 'primary',
                 }
+
             } else {
                 this.doc = {
+                    certification_id: '',
                     resident: '',
                     email: '',
                     phoneNum: '',
-                    documentType: '',
+                    document_type: null,
                     purpose: '',
                     date_release: '',
                 }
+
                 this.btnSubmit = {
                     icon: 'mdi-content-save',
                     loading: false,
@@ -244,16 +266,15 @@ export default {
             return uniqueId;
 
         },
-        getResident() {
-            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
+        async getResident() {
+            await axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'getResident',
             }).then(response => {
-                console.log(response.data);
                 this.residents = response.data;
             })
         },
-        getDocuments() {
-            axios.post('http://localhost/bms/src/php/Request/fetch.php', {
+        async getDocuments() {
+            await axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'getDocs',
             }).then(response => {
                 this.documents = response.data;
@@ -286,12 +307,13 @@ export default {
             return Number.isNaN(parseInt(this.doc.fee) - parseInt(this.doc.total)) ? 0 : parseInt(this.doc.fee) - parseInt(this.doc.total);
         },
         isResident() {
-            return this.residents.includes(this.doc.resident) || this.selectedRow;
+            const result = this.residents.includes(this.doc.resident) || this.selectedRow ? true : false;
+            return result;
         }
     },
-    mounted() {
-        this.getResident();
-        this.getDocuments();
+    async mounted() {
+        await this.getResident();
+        await this.getDocuments();
         this.setForm();
     }
 }

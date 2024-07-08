@@ -18,16 +18,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 $req = json_decode(file_get_contents("php://input"));
 
 if ($req) {
-    switch($req->action){
+    switch ($req->action) {
         case 'updateArchive':
             $stmt = $conn->prepare("UPDATE `certification` SET `archive`= ? WHERE `certification_id` = ?;");
             $stmt->bind_param("ss", $req->archive, $req->id);
             $stmt->execute();
-            if($stmt->affected_rows > 0){
+            if ($stmt->affected_rows > 0) {
                 echo json_encode(true);
-            }else{
+            } else {
                 echo json_encode(false);
             }
+            break;
+        case 'updateReq':
+            $stmt = $conn->prepare("UPDATE `certification` SET `phone_num`=?,`email`=?,`document_id`=?,`release_date`=?,`purpose`=? WHERE `certification_id` = ?;");
+            $stmt->bind_param("ssssss", $req->phone_num, $req->email, $req->document_id, $req->release_date, $req->purpose, $req->certification_id);
+            $stmt->execute();
+            if ($stmt->affected_rows > 0) {
+                echo json_encode(true);
+            } else {
+                echo json_encode(false);
+            }
+            break;
+        case 'updateRelease':
+            $stmt = $conn->prepare("UPDATE `certification` SET `isReleased`= ? WHERE `certification_id` = ?;");
+            $stmt->bind_param("ss", $req->isReleased, $req->id);
+            $stmt->execute();
+            if ($stmt->affected_rows > 0) {
+                echo json_encode(true);
+            } else {
+                echo json_encode(false);
+            }
+            break;
+        case 'updateDocStatus':
+            $stmt = $conn->prepare("UPDATE `doc_status` SET `doc_status`= ?, `date_status`= LOCALTIMESTAMP, `remarks`= ? WHERE `certification_id` = ?;");
+            $stmt->bind_param("sss", $req->doc_status, $req->remarks, $req->certification_id);
+            $stmt->execute();
+            if ($stmt->affected_rows > 0) {
+                echo json_encode(true);
+            } else {
+                echo json_encode(false);
+            }
+            break;
     }
-$conn->close();
+    $conn->close();
 }
