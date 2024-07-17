@@ -19,7 +19,7 @@
                     </v-row>
                     <v-row no-gutters v-if="messageType == 'gmail'">
                         <v-col>
-                            <v-text-field v-model="subject" variant="outlined" label="Send To"
+                            <v-text-field v-model="subject" variant="outlined" label="Subject"
                                 :rules="[v => !!v || 'Required']"></v-text-field>
                         </v-col>
                     </v-row>
@@ -50,7 +50,6 @@ export default {
         },
         doc_status: {
             type: String,
-            required: true,
         },
         messageType: {
             type: String,
@@ -61,7 +60,7 @@ export default {
         return {
             to: '',
             message: '',
-            subject: `TESTING: Certification Request ${this.doc_status}`,
+            subject: '',
 
             btnClicked: false,
             btnFormat: {
@@ -96,6 +95,11 @@ export default {
                             this.btnFormat.text = 'Failed';
                         }
                     });
+                    setTimeout(() => {
+                        this.btnFormat.loading = false;
+                        this.btnFormat.color = 'error';
+                        this.btnFormat.text = 'Failed';
+                    }, 5000);
                 } else if (this.messageType == 'sms') {
                     this.btnFormat.loading = false;
                     this.btnFormat.color = 'warning';
@@ -105,6 +109,7 @@ export default {
         },
     }, mounted() {
         this.to = this.contact;
+        this.subject = this.doc_status ? `Certification Request ${this.doc_status}` : '';
     }
 }
 </script>

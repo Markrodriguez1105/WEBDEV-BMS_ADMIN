@@ -26,6 +26,11 @@
                 {{ value }}
             </v-chip>
         </template>
+        <template v-slot:item.isReleased="{ value }">
+            <v-chip :color="value == 'Released' ? 'green' : 'red'" variant="outlined">
+                {{ value }}
+            </v-chip>
+        </template>
         <template v-slot:item.date_request="{ value }">
             <td>{{ date(value).toLocaleDateString() }}</td>
         </template>
@@ -44,7 +49,7 @@
                     <p>Gender</p>
                     <h4>{{ item.gender }}</h4>
                 </td>
-                <td>
+                <td colspan="2">
                     <p>Civil Status</p>
                     <h4>{{ item.civil_status }}</h4>
                 </td>
@@ -56,23 +61,17 @@
             </tr>
             <tr style="background-color: rgba(0, 0, 0, .1);">
                 <td>
-                    <p>Release Status</p>
-                    <h4>
-                        {{ item.isReleased }}
-                    </h4>
-                </td>
-                <td>
                     <p>Phone Number</p>
                     <h4 style="cursor: pointer;" @click="copyToClipboard(item.phone_num)">{{ item.phone_num }}
                         <v-icon v-if="item.phone_num" size="x-small">mdi-content-copy</v-icon>
                     </h4>
                 </td>
-                <td>
+                <td colspan="2">
                     <p>Email Address</p>
                     <h4 style="cursor: pointer;" @click="copyToClipboard(item.email)">{{ item.email }} <v-icon
                             v-if="item.email" size="x-small">mdi-content-copy</v-icon></h4>
                 </td>
-                <td>
+                <td colspan="2">
                     <p>Remarks</p>
                     <h4>{{ item.remarks }}</h4>
                 </td>
@@ -84,43 +83,50 @@
             </tr>
             <tr style="background-color: rgba(0, 0, 0, .1);">
                 <td :colspan="columns.length">
-                    <div class="d-flex justify-end" v-if="item.archive == 1">
-                        <v-btn icon variant="plain"
-                            @click="archive(item.certification_id, item.archive)"><v-icon>mdi-file-restore-outline</v-icon>
-                            <v-tooltip activator="parent" location="bottom">Restore</v-tooltip></v-btn>
-                    </div>
-                    <div class="d-flex justify-end" v-else>
-                        <v-btn v-if="item.payment_status.toLowerCase() == 'paid'" icon variant="text">
-                            <v-icon color="primary">mdi-printer</v-icon>
-                            <v-tooltip activator="parent" location="bottom">Print</v-tooltip>
-                        </v-btn>
-                        <v-btn v-else icon variant="text"><v-icon>mdi-cash</v-icon><v-tooltip activator="parent"
-                                location="bottom">Payment</v-tooltip>
-                            <RequestPayment :selectedRow="item" :reload="reload" />
-                        </v-btn>
-                        <v-btn icon variant="text"><v-icon>mdi-card-text-outline</v-icon>
-                            <v-tooltip activator="parent" location="bottom">Action</v-tooltip>
-                        <RequestApproval :getReq="getReq" :selectedRow="item"/>
-                        </v-btn>
+                    <v-row class="justify-end align-center ga-2" no-gutters>
+                        <v-col cols="auto">
+                            <v-btn icon variant="plain" v-if="item.archive == 1"
+                                @click="archive(item.certification_id, item.archive)"><v-icon>mdi-file-restore-outline</v-icon>
+                                <v-tooltip activator="parent" location="bottom">Restore</v-tooltip></v-btn>
+                            <v-btn-group color="primary" variant="tonal" v-else>
+                                <v-btn v-if="item.payment_status.toLowerCase() == 'paid' && item.doc_status == 'Approved'" icon>
+                                    <v-icon>mdi-printer</v-icon>
+                                    <v-tooltip activator="parent" location="bottom">Print</v-tooltip>
+                                    <RequestPrint :certification_id="item.certification_id" />
+                                </v-btn>
+                                <v-btn v-else-if="item.doc_status == 'Approved' && item.isReleased =='Not Released'" icon><v-icon>mdi-cash</v-icon><v-tooltip activator="parent"
+                                        location="bottom">Payment</v-tooltip>
+                                    <RequestPayment :selectedRow="item" :reload="reload" />
+                                </v-btn>
+                                <v-btn v-if="item.isReleased == 'Not Released'" icon><v-icon>mdi-card-text-outline</v-icon>
+                                    <v-tooltip activator="parent" location="bottom">Action</v-tooltip>
+                                    <RequestApproval :getReq="getReq" :selectedRow="item" />
+                                </v-btn>
+                            </v-btn-group>
+                        </v-col>
+                        <v-col cols="auto">
+                            <v-btn-group variant="tonal">
 
-                        <v-divider vertical class="my-2"></v-divider>
-
-                        <v-btn
-                            v-if="item.isReleased.toLowerCase() == 'not released' && item.payment_status.toLowerCase() == 'paid'"
-                            icon variant="plain"
-                            @click="isRelased(item.certification_id, 0)"><v-icon>mdi-file-move-outline</v-icon>
-                            <v-tooltip activator="parent" location="bottom">Release</v-tooltip></v-btn>
-                        <v-btn icon variant="plain"
-                            v-if="item.payment_status == 'Not Paid'"><v-icon>mdi-pencil</v-icon><v-tooltip
-                                activator="parent" location="bottom">Edit</v-tooltip>
-                            <RequestForm titleBox="Edit" icon="mdi-pencil" :selectedRow="item" :getReq="getReq" />
-                        </v-btn>
-                        <v-btn icon variant="plain"
-                            @click="archive(item.certification_id, item.archive)"><v-icon>mdi-archive-arrow-down-outline</v-icon>
-                            <v-tooltip activator="parent" location="bottom">Archive</v-tooltip></v-btn>
-                        <v-btn icon variant="plain"><v-icon>mdi-email-fast-outline</v-icon>
-                            <v-tooltip activator="parent" location="bottom">Send Message</v-tooltip></v-btn>
-                    </div>
+                                <v-btn
+                                    v-if="item.isReleased.toLowerCase() == 'not released' && item.payment_status.toLowerCase() == 'paid' && item.doc_status == 'Approved'"
+                                    icon @click="isRelased(item.certification_id, 0)"><v-icon>mdi-file-move-outline</v-icon>
+                                    <v-tooltip activator="parent" location="bottom">Release</v-tooltip></v-btn>
+                                <v-btn icon
+                                    v-if="item.doc_status != 'Approved'"><v-icon>mdi-pencil</v-icon><v-tooltip
+                                        activator="parent" location="bottom">Edit</v-tooltip>
+                                    <RequestForm titleBox="Edit" icon="mdi-pencil" :selectedRow="item"
+                                        :getReq="getReq" />
+                                </v-btn>
+                                <!-- <v-btn icon
+                                    @click="archive(item.certification_id, item.archive)"><v-icon>mdi-archive-arrow-down-outline</v-icon>
+                                    <v-tooltip activator="parent" location="bottom">Archive</v-tooltip></v-btn> -->
+                                <v-btn icon><v-icon>mdi-email-fast-outline</v-icon>
+                                    <RequestComposeMessage :contact="item.email" messageType="gmail" />
+                                    <v-tooltip activator="parent" location="bottom">Send Email</v-tooltip>
+                                </v-btn>
+                            </v-btn-group>
+                        </v-col>
+                    </v-row>
                 </td>
             </tr>
         </template>
@@ -155,6 +161,7 @@ export default {
                 { title: 'Document Type', align: 'start', width: 200, key: 'document_type' },
                 { title: 'Payment Status', align: 'start', width: 200, key: 'payment_status' },
                 { title: 'Approval Status', align: 'start', width: 200, key: 'doc_status' },
+                { title: 'Release Status', align: 'start', width: 200, key: 'isReleased' },
             ]
         }
     },

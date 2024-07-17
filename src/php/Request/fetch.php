@@ -170,18 +170,6 @@ if ($req) {
             }
             $stmt->close();
             break;
-        case 'getDeclined':
-            $stmt = $conn->query("SELECT * FROM reqdoc AS rd RIGHT JOIN declined_cert AS dc ON rd.certification_id = dc.certification_id;");
-            if ($stmt->num_rows > 0) {
-                while ($row = $stmt->fetch_assoc()) {
-                    $row = convert($row);
-
-                    $document[] = $row;
-                }
-                echo json_encode($document);
-            }
-            $stmt->close();
-            break;
         case 'getPrice':
             $stmt = $conn->prepare("SELECT cost FROM `document` WHERE `document_id` = ?;");
             $stmt->bind_param("s", $req->document_id);
@@ -201,6 +189,69 @@ if ($req) {
             if ($result->num_rows > 0) {
                 $result = $result->fetch_assoc();
                 $result['doc_status'] = $result['doc_status'] == '1' ? 'Approved' : 'Declined';
+                echo json_encode($result);
+            }
+            $stmt->close();
+            break;
+        case 'printDetails':
+            $stmt = $conn->prepare("SELECT c.certification_id, c.purpose, r.first_name, r.middle_name,r.last_name, r.suffix, FLOOR(DATEDIFF(CURDATE(), r.birth_date) / 365.25) AS age, r.gender, r.nationality, r.civil_status, ced.total ,ced.date_issued, ced.cedula_num, ct.stamp_fee, ct.document_cost, ct.date_paid, d.description, CASE WHEN rp.report_type IS NOT NULL THEN GROUP_CONCAT(DISTINCT rp.report_type SEPARATOR ', ') ELSE 'No Derogatory Record' END AS remarks FROM `certification` AS c LEFT JOIN resident AS r ON c.resident_id = r.resident_id LEFT JOIN cedula as ced ON c.resident_id = ced.resident_id LEFT JOIN certificationtreasury AS ct ON c.certification_id = ct.document_id LEFT JOIN document AS d ON c.document_id = d.document_id LEFT JOIN report rp ON r.first_name = rp.first_name && r.middle_name = rp.middle_name && r.last_name = rp.last_name && r.suffix = rp.suffix WHERE c.certification_id = ?;");
+            $stmt->bind_param("s", $req->certification_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $document = $row;
+                }
+                echo json_encode($document);
+            }
+            $stmt->close();
+            break;
+        case 'getOfficials':
+            $stmt = $conn->query("SELECT official.official_id, official.first_name, official.middle_name, official.last_name, official.suffix, position.description FROM `official` LEFT JOIN position ON official.position_id = position.position_id ORDER BY position.position_id;");
+            if ($stmt->num_rows > 0) {
+                while ($row = $stmt->fetch_assoc()) {
+                    $officials[] = $row;
+                }
+                echo json_encode($officials);
+            }
+            $stmt->close();
+            break;
+        case 'getApprove':
+            $stmt = $conn->query("SELECT * FROM `reqdoc` WHERE `archive` = 0 && doc_status = 1;");
+
+            if ($stmt->num_rows > 0) {
+                $result = array();
+                while ($row = $stmt->fetch_assoc()) {
+                    $row = convert($row);
+                    $result[] = $row;
+                }
+                echo json_encode($result);
+            }
+            $stmt->close();
+            break;
+        case 'getDeclined':
+            $stmt = $conn->query("SELECT * FROM `reqdoc` WHERE `archive` = 0 && doc_status = 0;");
+
+            if ($stmt->num_rows > 0) {
+                $result = array();
+                while ($row = $stmt->fetch_assoc()) {
+                    $row = convert($row);
+                    $result[] = $row;
+                }
+                echo json_encode($result);
+            }
+            $stmt->close();
+            break;
+        case 'getPending':
+            $stmt = $conn->query("SELECT * FROM `reqdoc` WHERE `archive` = 0 && doc_status IS NULL;");
+
+            if ($stmt->num_rows > 0) {
+                $result = array();
+                while ($row = $stmt->fetch_assoc()) {
+                    $row = convert($row);
+                    $result[] = $row;
+                }
                 echo json_encode($result);
             }
             $stmt->close();

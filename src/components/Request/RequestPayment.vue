@@ -1,5 +1,5 @@
 <template>
-    <v-dialog max-width="600" persistent activator="parent">
+    <v-dialog max-width="500" persistent activator="parent">
         <template v-slot:default="{ isActive }">
             <v-toolbar color="primary" class="pl-9 pr-4">
                 <v-icon>mdi-cash</v-icon>

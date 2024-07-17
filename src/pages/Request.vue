@@ -29,7 +29,7 @@
                             <span>{{ countAllDocument }}</span>
                         </div>
                     </v-list-item>
-                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click=""
+                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click="getApproved()"
                         value="approved">
                         <div class="d-flex justify-space-between align-center">
                             <div class="d-flex ga-2 align-center">
@@ -38,7 +38,16 @@
                             </div>
                         </div>
                     </v-list-item>
-                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click=""
+                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click="getPending()"
+                        value="pending">
+                        <div class="d-flex justify-space-between align-center">
+                            <div class="d-flex ga-2 align-center">
+                                <v-icon size="small">mdi-file-clock-outline</v-icon>
+                                <p>Pending</p>
+                            </div>
+                        </div>
+                    </v-list-item>
+                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click="getDeclined()"
                         value="declined">
                         <div class="d-flex justify-space-between align-center">
                             <div class="d-flex ga-2 align-center">
@@ -60,11 +69,11 @@
                         </template>
 
                         <v-list-item class="navigationsIcons" rounded min-height="20" color="primary"
-                            @click="getFilterPayment(0)" value="pending">
+                            @click="getFilterPayment(0)" value="not paid">
                             <div class="d-flex justify-space-between align-center">
                                 <div class="d-flex ga-2 align-center">
                                     <v-icon>mdi-cash-clock</v-icon>
-                                    <p>Pending</p>
+                                    <p>Not Paid</p>
                                 </div>
                             </div>
                         </v-list-item>
@@ -132,7 +141,7 @@
                             </div>
                         </v-list-item>
                     </v-list-group>
-                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click="getArchive()"
+                    <!-- <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" @click="getArchive()"
                         value="archive">
                         <div class="d-flex justify-space-between align-center">
                             <div class="d-flex ga-2 align-center">
@@ -140,15 +149,15 @@
                                 <p>Archive</p>
                             </div>
                         </div>
-                    </v-list-item>
-                    <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" value="setting" @click="show()">
+                    </v-list-item> -->
+                    <!-- <v-list-item color="primary" class="navigationsIcons" variant="text" rounded min-height="20" value="setting" @click="show()">
                         <div class="d-flex justify-space-between align-center">
                             <div class="d-flex ga-2 align-center">
                                 <v-icon size="small">mdi-cog</v-icon>
                                 <p>Setting</p>
                             </div>
                         </div>
-                    </v-list-item>
+                    </v-list-item> -->
                 </v-list>
             </v-col>
             <v-col>
@@ -255,18 +264,6 @@ export default {
                 this.loaded = false;
             }, 1000);
         },
-        async getDeclined() {
-            this.loaded = true;
-            this.document = [];
-            const response = await this.fetchPhp('getDeclined');
-
-            setTimeout(() => {
-                if (response) {
-                    this.document = response;
-                }
-                this.loaded = false;
-            }, 1000);
-        },
         async getByCategory(document_id) {
             this.loaded = true;
             this.document = [];
@@ -274,6 +271,51 @@ export default {
             axios.post('http://localhost/bms/src/php/Request/fetch.php', {
                 action: 'getByCategory',
                 document_id: document_id,
+            }).then(response => {
+                setTimeout(() => {
+                    if (response.data) {
+                        this.document = response.data;
+                    }
+                    this.loaded = false;
+                }, 1000);
+            });
+        },
+        async getApproved() {
+            this.loaded = true;
+            this.document = [];
+
+            await axios.post('http://localhost/bms/src/php/Request/fetch.php', {
+                action: 'getApprove',
+            }).then(response => {
+                setTimeout(() => {
+                    if (response.data) {
+                        this.document = response.data;
+                    }
+                    this.loaded = false;
+                }, 1000);
+            });
+        },
+        async getDeclined() {
+            this.loaded = true;
+            this.document = [];
+
+            await axios.post('http://localhost/bms/src/php/Request/fetch.php', {
+                action: 'getDeclined',
+            }).then(response => {
+                setTimeout(() => {
+                    if (response.data) {
+                        this.document = response.data;
+                    }
+                    this.loaded = false;
+                }, 1000);
+            });
+        },
+        async getPending() {
+            this.loaded = true;
+            this.document = [];
+
+            await axios.post('http://localhost/bms/src/php/Request/fetch.php', {
+                action: 'getPending',
             }).then(response => {
                 setTimeout(() => {
                     if (response.data) {
@@ -330,10 +372,19 @@ export default {
                     this.getFilterRelease("Released");
                     break;
                 case "paid":
-                    this.getFilterPayment("Paid");
+                    this.getFilterPayment("1");
+                    break;
+                case "not paid":
+                    this.getFilterPayment("0");
+                    break;
+                case "approved":
+                    this,this.getApproved();
                     break;
                 case "pending":
-                    this.getFilterPayment("Pending");
+                    this.getPending();
+                    break;
+                case "declined":
+                    this.getDeclined();
                     break;
                 default:
                     this.getByCategory(this.navSelected.toLocaleString());

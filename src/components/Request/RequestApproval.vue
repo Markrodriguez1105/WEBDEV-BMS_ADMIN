@@ -1,5 +1,5 @@
 <template>
-    <v-dialog activator="parent" scrollable persistent max-width="500px" transition="dialog-transition">
+    <v-dialog activator="parent" scrollable persistent max-width="500" transition="dialog-transition">
         <template v-slot:default="{ isActive }">
             <v-toolbar color="primary" class="pl-9 pr-4">
                 <v-icon>mdi-card-text-outline</v-icon>
@@ -32,8 +32,8 @@
                     <v-row>
                         <v-col class="d-flex flex-column align-center justify-center">
                             <h4>Select Status</h4>
-                            <v-btn-toggle v-model="doc_status.doc_status" divided mandatory variant="outlined" rounded="xl"
-                                class="d-flex w-100 justify-center">
+                            <v-btn-toggle v-model="doc_status.doc_status" divided mandatory variant="outlined"
+                                rounded="xl" class="d-flex w-100 justify-center">
                                 <v-btn color="success" value="Approved"
                                     :prepend-icon="doc_status.doc_status == 'Approved' ? 'mdi-thumb-up' : 'mdi-thumb-up-outline'"
                                     width="30%">Approved</v-btn>
@@ -67,7 +67,7 @@
                                     id="editGmail">
                                     <v-icon>mdi-pencil</v-icon>
                                     <RequestComposeMessage :contact="selectedRow.email"
-                                        :doc_status="doc_status.doc_status" messageType="gmail"/>
+                                        :doc_status="doc_status.doc_status" messageType="gmail" :subject="subject"/>
                                 </v-btn>
                                 <v-tooltip activator="#editGmail" location="top">Compase Gmail</v-tooltip>
                             </v-btn-group>
@@ -215,7 +215,7 @@ export default {
                     Password: "24FA3C50230BA8A336EE127394AF9E214229",
                     To: this.selectedRow.email,
                     From: "markanthony.rodriguez@unc.edu.ph",
-                    Subject: `Certification Request ${this.doc_status.doc_status}`,
+                    Subject: this.subject,
                     Body: this.messageDraft,
                 }).then((message) => {
                     if (message == 'OK') {
@@ -229,6 +229,11 @@ export default {
                         this.btnGmail.text = 'Failed';
                     }
                 });
+                setTimeout(() => {
+                    this.btnGmail.loading = false;
+                    this.btnGmail.icon = 'mdi-close';
+                    this.btnGmail.text = 'Failed';
+                }, 5000);
             }
         }
     },
@@ -276,6 +281,9 @@ Barangay Secretary<br>
 <a href="mailto:markanthony.rodriguez@unc.edu.ph">markanthony.rodriguez@unc.edu.ph</a><br>
 Barangay Bonifacio, San Fernando, Camarines Sur</p>`
 
+        },
+        subject(){
+            return `Certification Request ${this.doc_status.doc_status}`;
         }
     },
     async mounted() {

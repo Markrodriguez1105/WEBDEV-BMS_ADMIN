@@ -16,6 +16,7 @@
     "datatables.net-dt": "^2.0.8",
     "express": "^4.19.2",
     "firebase": "^10.12.2",
+    "html2canvas": "^1.4.1",
     "jquery": "^3.7.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.10.0",
@@ -23,6 +24,7 @@
     "socket.io-client": "^4.7.5",
     "vee-validate": "^4.12.8",
     "vue": "^3.4.0",
+    "vue-html-to-paper": "^2.0.3",
     "vuetify": "^3.5.0"
   },
   "devDependencies": {
